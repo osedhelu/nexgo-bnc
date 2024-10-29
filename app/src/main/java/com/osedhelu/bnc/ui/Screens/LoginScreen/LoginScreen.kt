@@ -38,38 +38,24 @@ fun LoginScreen() {
     var terminalCode by rememberSaveable {
         mutableStateOf("")
     }
-    var commerceCode by rememberSaveable {
+    val commerceCode by rememberSaveable {
         mutableStateOf("")
     }
-
-
-
 
 
     LoginLayout() {
         if (commerce == null) {
             Text(
-                text = "Configurar Comercio", fontWeight = FontWeight.Bold, fontSize = 20.sp
+                text = "Acceso", fontWeight = FontWeight.Bold, fontSize = 20.sp
             )
         } else {
             Text(text = "Iniciar Sesion", fontWeight = FontWeight.Bold, fontSize = 20.sp)
         }
         Spacer(modifier = Modifier.size(10.dp))
 
-        InputGlobal(
-            title = "Codigo de Comercio",
-            value = commerceCode,
-            isError = commerceCode.length <= 5,
-            onChange = {
-                commerceCode = it
-            },
-            trailingIcon = {},
-            visualTransformation = VisualTransformation.None,
-            messageError = "Debe tener mas de 6 caracteres"
-        )
         Spacer(modifier = Modifier.size(10.dp))
         InputGlobal(
-            title = "Codigo de Terminal",
+            title = "Contraseña",
             value = terminalCode,
             isError = terminalCode.length <= 5,
             onChange = {
@@ -81,7 +67,6 @@ fun LoginScreen() {
                         painter = painterResource(id = R.drawable.icons_eyes),
                         contentDescription = null
                     )
-
                 }
             },
             visualTransformation = if (terminalCodeVisibility) VisualTransformation.None else PasswordVisualTransformation(),
@@ -107,12 +92,11 @@ fun LoginScreen() {
             )
         } else {
             ButtonPersonal(
-                title = "Guardar Commerce",
-                enabled = terminalCode.length >= 6 && commerceCode.length >= 6,
+                title = "Iniciar Sesion",
+                enabled = terminalCode.length >= 6,
                 onClick = {
                     CommerceLocalData.setCommerce(
                         ctx, CommerceLocalData(1, commerceCode, terminalCode, "", "", "")
-
                     )
                     GoToActivity(iNameActivity.MAIN, ctx, true)
                 },

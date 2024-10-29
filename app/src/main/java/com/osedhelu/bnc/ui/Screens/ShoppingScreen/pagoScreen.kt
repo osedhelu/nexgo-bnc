@@ -5,6 +5,7 @@ import androidx.navigation.NavController
 import com.osedhelu.bnc.ui.Screens.ShoppingScreen.tabs.PagoTab01
 import com.osedhelu.bnc.ui.Screens.ShoppingScreen.tabs.PagoTab03
 import com.osedhelu.bnc.ui.Screens.ShoppingScreen.tabs.PagoTab04
+import com.osedhelu.bnc.ui.Screens.ShoppingScreen.tabs.ScreenPassword
 import com.osedhelu.bnc.ui.Screens.ShoppingScreen.tabs.TypeMethodCard
 
 
@@ -22,6 +23,10 @@ fun PagoScreen(navController: NavController, numTab: Int = 1) {
 
         3 -> {
             PagoTab03(navController = navController)
+        }
+
+        4 -> {
+            ScreenPassword(navController = navController)
         }
 
         else -> {

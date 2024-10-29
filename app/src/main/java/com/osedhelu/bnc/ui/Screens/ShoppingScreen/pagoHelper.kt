@@ -9,7 +9,9 @@ import com.osedhelu.bnc.data.remote.dto.ResponseDto
 import com.osedhelu.bnc.utils.convertirANumeroDecimal
 
 data class PagoData(
-    val card: String = "", var amount: MutableState<String> = mutableStateOf("")
+    val card: String = "",
+    var amount: MutableState<String> = mutableStateOf(""),
+    val ping: String = ""
 )
 
 data class PagoDataResponse(val card: String, val amount: String)
@@ -40,4 +42,15 @@ object PagoHelper : ViewModel() {
     fun ValidAmount(amount: String): Boolean {
         return convertirANumeroDecimal(amount) >= 0.01
     }
+
+    fun validMaxAmount(numText: String): Boolean {
+        val num = try {
+            numText.toDouble()
+        } catch (e: Exception) {
+            0.00
+        }
+        return num >= 9000000000
+
+    }
 }
+

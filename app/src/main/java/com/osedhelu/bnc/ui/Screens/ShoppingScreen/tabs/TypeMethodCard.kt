@@ -49,13 +49,16 @@ fun TypeMethodCard(navController: NavController) {
     )
     LaunchedEffect(true) {
         delay(10000L) // 20 seconds delay
-        navController.navigate("compras/3") // Replace with the actual route of the next screen
+        if (amount > 20) {
+            navController.navigate("compras/4") // Replace with the actual route of the next screen
+        } else {
+            navController.navigate("compras/3") // Replace with the actual route of the next screen
+        }
     }
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .zIndex(1f),
-        contentAlignment = Alignment.Center
+            .zIndex(1f), contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
