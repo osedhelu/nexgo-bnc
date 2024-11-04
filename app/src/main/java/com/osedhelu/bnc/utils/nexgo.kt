@@ -111,8 +111,6 @@ fun PrintFacture(context: Context) {
     } catch (e: Exception) {
 
     }
-
-
 }
 
 fun PrintFacturaDetails(context: Context, details: iValueCardTransacion) {
@@ -576,8 +574,6 @@ fun NFCardNexgo(context: Context, callback: (serialCARD: String) -> Unit) {
 
         })
     } catch (e: Exception) {
-
-
     }
 
 }

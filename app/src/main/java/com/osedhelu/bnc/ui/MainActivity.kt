@@ -30,12 +30,12 @@ import com.osedhelu.bnc.ui.theme.MyApplicationTheme
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Install the splash screen
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
                     MainNavigation()
                 }

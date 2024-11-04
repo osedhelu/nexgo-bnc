@@ -1,12 +1,14 @@
+import com.android.build.api.dsl.DefaultConfig
+import com.android.build.gradle.api.ApplicationVariant
 import java.util.Properties
 import java.text.SimpleDateFormat
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import java.util.Date
-
+import java.io.File
 
 @Suppress("DSL_SCOPE_VIOLATION") // Remove when fixed https://youtrack.jetbrains.com/issue/KTIJ-19369
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.application) version "8.1.0" // Actualizar a una versión que soporte compileSdk 34
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.hilt.gradle)
@@ -15,13 +17,8 @@ plugins {
 
 android {
     namespace = "com.osedhelu.bnc"
-    compileSdk = 33
-    val localProperties = Properties()
-    val localPropertiesFile = rootProject.file("local.properties")
-    if (localPropertiesFile.exists()) {
-        localProperties.load(localPropertiesFile.inputStream())
-    }
-    // Obtener las propiedades necesarias de local.properties
+    compileSdk = 34
+    val localProperties = loadLocalProperties()
     val getPropertyValue: (String) -> String = { key ->
         localProperties.getProperty(key)
             ?: throw IllegalArgumentException("Property '$key' not found in local.properties")
@@ -30,42 +27,32 @@ android {
     defaultConfig {
         applicationId = "com.osedhelu.bnc"
         minSdk = 21
-        targetSdk = 33
-        versionName = "1.0"
+        targetSdk = 33 // Cambiar de 33 a 34
         versionCode = autoIncrementVersionCode()
-        
-        ///buildConfigField("String", "SERVER_URL", getPropertyValue("SERVER_URL"))
-        
+        versionName = autoIncrementVersionName()
+
+        configureBuildConfigFields(getPropertyValue)
 
         testInstrumentationRunner = "com.osedhelu.bnc.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
 
-        // Enable room auto-migrations
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
     }
-    applicationVariants.all {
-        val variant = this
-        val appName = "nexgobnc"
-        val date = SimpleDateFormat("yyyyMMdd").format(Date())
-        val versionCode = variant.versionCode
-        val variantName = variant.name
-        variant.outputs
-            .map { it as BaseVariantOutputImpl }
-            .forEach { output ->
-                val outputFileName = "${appName}${date}${versionCode}_${variantName}.apk"
 
-                println("OutputFileName: $outputFileName")
-                output.outputFileName = outputFileName
-            }
+    applicationVariants.all {
+        configureVariantOutput(this)
     }
+
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            )
         }
     }
 
@@ -81,7 +68,7 @@ android {
     buildFeatures {
         compose = true
         aidl = false
-        buildConfig = true 
+        buildConfig = true
         renderScript = false
         shaders = false
     }
@@ -98,7 +85,8 @@ android {
 }
 
 dependencies {
-
+    implementation("androidx.appcompat:appcompat:1.7.0-alpha01") // Actualizar a una versión compatible
+    implementation("androidx.core:core-ktx:1.13.0-alpha01") // Actualizar a una versión compatible
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -113,8 +101,6 @@ dependencies {
     implementation(libs.retrofit2.converter.gson)
     implementation(libs.jetbrains.kotlin)
 
-
-
     // Core Android dependencies
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -123,10 +109,8 @@ dependencies {
     // Hilt Dependency Injection
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
-    // Hilt and instrumented tests.
     androidTestImplementation(libs.hilt.android.testing)
     kaptAndroidTest(libs.hilt.android.compiler)
-    // Hilt and Robolectric tests.
     testImplementation(libs.hilt.android.testing)
     kaptTest(libs.hilt.android.compiler)
 
@@ -143,9 +127,7 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    // Tooling
     debugImplementation(libs.androidx.compose.ui.tooling)
-    // Instrumented tests
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
@@ -154,20 +136,70 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 
     // Instrumented tests: jUnit rules and runners
-
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.runner)
 }
 
-fun autoIncrementVersionCode(): Int? {
-    var code = 1
-    val versionCodeFile = File("version_code.txt")
+fun loadLocalProperties(): Properties {
+    val properties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        properties.load(localPropertiesFile.inputStream())
+    }
+    return properties
+}
 
-    if (versionCodeFile.exists()) {
-        code = versionCodeFile.readText().toInt()
-        code++
+fun autoIncrementVersionCode(): Int {
+    val versionCodeFile = File("version_code.txt")
+    val code = if (versionCodeFile.exists()) {
+        versionCodeFile.readText().toInt() + 1
+    } else {
+        1
     }
     versionCodeFile.writeText(code.toString())
     return code
+}
+
+fun DefaultConfig.configureBuildConfigFields(getPropertyValue: (String) -> String) {
+    val envLocal: (name: String, type: String) -> Unit = { name, type ->
+        val value = getPropertyValue(name)
+        buildConfigField(type, name, "\"$value\"")
+    }
+    envLocal("baseUrl", "String")
+    envLocal("appName", "String")
+    envLocal("appVersion", "String")
+    envLocal("ksn", "String")
+    envLocal("affiliationId", "String")
+    envLocal("userId", "String")
+    envLocal("merchant", "String")
+    envLocal("terminal", "String")
+    envLocal("lotNumber", "String")
+}
+
+fun configureVariantOutput(variant: ApplicationVariant) {
+    val appName = "nexgobnc"
+    val date = SimpleDateFormat("yyyyMMdd").format(Date())
+    val versionCode = variant.versionCode
+    val variantName = variant.name
+    variant.outputs.map { it as BaseVariantOutputImpl }.forEach { output ->
+        val outputFileName = "${appName}${date}${versionCode}_${variantName}.apk"
+        println("OutputFileName: $outputFileName")
+        output.outputFileName = outputFileName
+    }
+}
+
+fun autoIncrementVersionName(): String {
+    val versionNameFile = File("version_name.txt")
+    val versionName = if (versionNameFile.exists()) {
+        val parts = versionNameFile.readText().split(".")
+        val major = parts[0].toInt()
+        val minor = parts[1].toInt()
+        val patch = parts[2].toInt() + 1
+        "$major.$minor.$patch"
+    } else {
+        "1.0.0"
+    }
+    versionNameFile.writeText(versionName)
+    return versionName
 }

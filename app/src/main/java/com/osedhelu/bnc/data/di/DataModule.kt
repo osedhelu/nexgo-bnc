@@ -3,7 +3,7 @@ package com.osedhelu.bnc.data.di
 import android.content.Context
 import androidx.room.Room
 import com.google.gson.GsonBuilder
-import com.osedhelu.bnc.config.URL_BASE
+import com.osedhelu.bnc.config.BASEURL
 import com.osedhelu.bnc.data.local.database.AppDatabase
 import com.osedhelu.bnc.data.local.database.TransactionDao
 import com.osedhelu.bnc.data.remote.BancoDataSource
@@ -25,8 +25,7 @@ object DataSourceModule {
     @Singleton
     @Provides
     @Named("BACKEND_URL")
-    fun providerUrl() = URL_BASE
-
+    fun providerUrl() = BASEURL
 
     @Singleton
     @Provides

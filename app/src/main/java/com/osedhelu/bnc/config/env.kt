@@ -5,17 +5,29 @@ import com.osedhelu.bnc.BuildConfig
 const val PRICE_VALIDATE = 1000
 
 //Backend BANCK
-const val URL_BASE = "BuildConfig.SERVER_URL" 
-val JWT_SECRET = "BuildConfig.JWT_SECRET" 
-const val BANK_CANAL ="BuildConfig.CANAL" 
-const val HASH_ENCRIPT = "BuildConfig.HASH_ENCRIPT" 
 const val SERIAL_DEFAULT = "1234567"
+const val BASEURL = BuildConfig.baseUrl
+const val APPNAME = BuildConfig.appName
+const val APPVERSION = BuildConfig.appVersion
+const val KSN = BuildConfig.ksn
+const val AFFILIATION_ID = BuildConfig.affiliationId
+const val USER_ID = BuildConfig.userId
+const val MERCHANT = BuildConfig.merchant
+const val TERMINAL = BuildConfig.terminal
+const val LOT_NUMBER = BuildConfig.lotNumber
+
+// endpoints api
+const val GET_INFO_AFFILIATION = "/api-echo/v1/resumen"
+const val BATCH_SUMMARY = "/api-echo/v1/transactions"
+const val ECHO_TEST = "/api-echo/v1/users/gestion"
+const val PATH_GET_TRANSACTION = "/api-echo/v1/transactions"
+const val PATH_TRANSACTION_AFFILIATION = "/api-echo/v1/transactions/affiliation"
+const val PATH_RECEIVER_STATUS = "/api-echo/v1/receiver/status"
 
 
 //Api
-const val PATH_BANK_PAYMENT = "payments"
-const val PATH_BANK_AUTH = "$PATH_BANK_PAYMENT/authorization"
-const val PATH_BANK_ANNULATION = "$PATH_BANK_PAYMENT/annulment"
+const val JWT_SECRET = "1234567890123456"
+const val HASH_ENCRIPT = "1234567890123456"
 
 
 const val FontSize = 18

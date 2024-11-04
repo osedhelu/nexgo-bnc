@@ -1,131 +1,109 @@
 package com.osedhelu.bnc.data.remote.apiBanco
 
-import androidx.lifecycle.LiveData
-import com.osedhelu.bnc.data.local.database.Transaction
 import com.osedhelu.bnc.data.local.database.TransactionDao
 import com.osedhelu.bnc.data.remote.BancoDataSource
-import com.osedhelu.bnc.data.remote.dto.AnnulmentDto
-import com.osedhelu.bnc.data.remote.dto.AnnulmentRespDto
-import com.osedhelu.bnc.data.remote.dto.PaymentDto
-import com.osedhelu.bnc.data.remote.dto.PaymentRespDto
-import com.osedhelu.bnc.data.remote.dto.ResponseDto
-import com.osedhelu.bnc.utils.getDatetime
-import com.osedhelu.bnc.utils.jsonParse
-import com.osedhelu.bnc.utils.jsonStringify
-import retrofit2.HttpException
+import com.osedhelu.bnc.data.remote.dto.ApiResponseStatus
+import com.osedhelu.bnc.data.remote.dto.EchoTestDto
+import com.osedhelu.bnc.data.remote.dto.EchoTestDtoResp
+import com.osedhelu.bnc.data.remote.dto.GetInfoAffiliatesResp
+import com.osedhelu.bnc.data.remote.dto.ReceiverStatusDTO
+import com.osedhelu.bnc.data.remote.dto.TransacionDtoResp
+import com.osedhelu.bnc.data.remote.dto.makeNetworkCall
 import javax.inject.Inject
 
 
 interface ApiBancoRepository {
-    suspend fun emitPayment(body: PaymentDto): ResponseDto<PaymentRespDto>
-    suspend fun AnnulmentPayment(body: AnnulmentDto): ResponseDto<AnnulmentRespDto>
-    fun getAllTransationsDB(): LiveData<List<Transaction>>
-    fun deleteInvoiceNotToday()
+    suspend fun receiverStatus(): ApiResponseStatus<ReceiverStatusDTO>
+    suspend fun getInfoAffiliation(
+        taxId: String,
+        serial: String,
+        appName: String,
+        appVersion: String
+    ): ApiResponseStatus<GetInfoAffiliatesResp>
+
+    suspend fun getBatchSummary(affiliationId: String): ApiResponseStatus<String>
+    suspend fun getInfoEchoTest(body: EchoTestDto): ApiResponseStatus<EchoTestDtoResp>
+    suspend fun getTransactions(
+        merchant: String,
+        terminal: String,
+        cant: Int,
+        all: Boolean,
+        batches: Boolean,
+        origin: Boolean,
+        lotNumber: String
+    ): ApiResponseStatus<TransacionDtoResp>
+
+    suspend fun getTransactionsAffiliation(
+        affiliationId: String,
+        cant: Int,
+        all: Boolean,
+        batches: Boolean,
+        lotNumber: String,
+        signature: Boolean
+    ): ApiResponseStatus<Unit>
+
+    suspend fun registerTransaction(body: String): ApiResponseStatus<String>
 }
 
 class ApiBancoRepositoryImp @Inject constructor(
     private val MiApiDataSource: BancoDataSource, private val transactionDb: TransactionDao
 ) : ApiBancoRepository {
 
-
-    override suspend fun emitPayment(body: PaymentDto): ResponseDto<PaymentRespDto> {
-        return try {
-
-            val response = MiApiDataSource.emitPayment(body)
-
-            val date = getDatetime()
-
-            transactionDb.insert(
-                Transaction(
-                    receiptId = response.receiptId!!,
-                    rrn = response.rrn!!,
-                    statusCode = response.statusCode!!,
-                    statusDescription = response.statusDescription!!,
-                    amount = body.amount!!,
-                    card = body.card!!,
-                    ok = true,
-                    fecha = date.fecha
-                )
-            )
-            ResponseDto(
-                data = response, ok = true
-            )
-        } catch (e: HttpException) {
-            val response = e.response()?.errorBody()?.string()
-            val date = getDatetime()
-            if (response.isNullOrBlank()) {
-                ResponseDto(
-                    ok = false, data = PaymentRespDto()
-                )
-            } else {
-                val resp = jsonParse<PaymentRespDto>(response)
-
-                try {
-                    transactionDb.insert(
-                        Transaction(
-                            receiptId = "${resp.receiptId}",
-                            rrn = "${resp.rrn}",
-                            statusCode = "${resp.statusCode}",
-                            statusDescription = "${resp.statusDescription}",
-                            amount = "${body.amount}",
-                            card = "${body.card}",
-                            ok = false,
-                            fecha = date.fecha
-                        )
-                    )
-                } catch (err: NullPointerException) {
-                    println("xxxxxxxxxxxxxxxxxxxError NullPointerException ${err}")
-                } catch (err: Exception) {
-                    println("xxxxxxxxxxxxxxxxxxxError Exception ${err}")
-                }
-                ResponseDto(
-                    ok = false, data = resp
-
-                )
-            }
-
-        } catch (e: Exception) {
-            println("xxxxxxxxxxxxxxxxxxxError Exception ${e}")
-            ResponseDto(
-                ok = false, data = PaymentRespDto()
-
-            )
+    override suspend fun receiverStatus(): ApiResponseStatus<ReceiverStatusDTO> =
+        makeNetworkCall {
+            MiApiDataSource.receiverStatus()
         }
+
+    override suspend fun getInfoAffiliation(
+        taxId: String,
+        serial: String,
+        appName: String,
+        appVersion: String
+    ) = makeNetworkCall {
+        MiApiDataSource.getInfoAffiliation(taxId, serial, appName, appVersion)
     }
 
-    override suspend fun AnnulmentPayment(
-        body: AnnulmentDto,
-    ): ResponseDto<AnnulmentRespDto> {
-        return try {
-            val resp = MiApiDataSource.AnnulmentPayment(body)
-            this.transactionDb.deleteOneInvoice(body.receiptId)
-            ResponseDto(
-                ok = true, data = resp
-            )
-
-        } catch (e: HttpException) {
-
-            val response = e.response()?.errorBody()?.string()
-
-            val resp = response?.let { jsonParse<AnnulmentRespDto>(it) }
-            ResponseDto(
-                ok = false, data = resp!!
-            )
-        } catch (e: Exception) {
-            ResponseDto(
-                ok = false, data = AnnulmentRespDto("", "")
-            )
+    override suspend fun getBatchSummary(affiliationId: String): ApiResponseStatus<String> =
+        makeNetworkCall {
+            MiApiDataSource.getBatchSummary(affiliationId)
         }
+
+    override suspend fun getInfoEchoTest(body: EchoTestDto): ApiResponseStatus<EchoTestDtoResp> =
+        makeNetworkCall {
+            MiApiDataSource.getInfoEchoTest(body)
+        }
+
+    override suspend fun getTransactions(
+        merchant: String,
+        terminal: String,
+        cant: Int,
+        all: Boolean,
+        batches: Boolean,
+        origin: Boolean,
+        lotNumber: String
+    ): ApiResponseStatus<TransacionDtoResp> = makeNetworkCall {
+        MiApiDataSource.getTransactions(
+            merchant, terminal, cant, all, batches, origin, lotNumber
+        )
     }
 
-
-    override fun getAllTransationsDB(): LiveData<List<Transaction>> {
-
-        return this.transactionDb.getAll()
+    override suspend fun getTransactionsAffiliation(
+        affiliationId: String,
+        cant: Int,
+        all: Boolean,
+        batches: Boolean,
+        lotNumber: String,
+        signature: Boolean
+    ): ApiResponseStatus<Unit> = makeNetworkCall {
+        MiApiDataSource.getTransactionsAffiliation(
+            affiliationId, cant, all, batches, lotNumber, signature
+        )
     }
 
-    override fun deleteInvoiceNotToday() {
-        val date = getDatetime()
-        this.transactionDb.deleteInvoiceNotToday(date.fecha)
-    }
+    override suspend fun registerTransaction(body: String): ApiResponseStatus<String> =
+        makeNetworkCall {
+            MiApiDataSource.registerTransaction(body)
+        }
+
+
 }

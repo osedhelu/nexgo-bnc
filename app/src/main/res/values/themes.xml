@@ -16,6 +16,18 @@
   -->
 
 <resources>
+    <!-- Eliminar la definición duplicada de Theme.nexgobnc -->
+    <!-- <style name="Theme.nexgobnc" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryDark">@color/purple_700</item>
+        <item name="colorAccent">@color/teal_200</item>
+    </style> -->
 
-    <style name="Theme.nexgobnc" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Splash screen theme -->
+    <style name="Theme.Splash" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo_nexgo</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <item name="postSplashScreenTheme">@style/Theme.nexgobnc</item>
+    </style>
 </resources>

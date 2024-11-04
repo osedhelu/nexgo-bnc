@@ -3,13 +3,12 @@ package com.osedhelu.bnc.utils
 
 import android.util.Base64
 import com.osedhelu.bnc.config.HASH_ENCRIPT
-import javax.crypto.Mac
-import javax.crypto.spec.SecretKeySpec
-
 import com.osedhelu.bnc.config.JWT_SECRET
 import org.json.JSONObject
 import javax.crypto.Cipher
+import javax.crypto.Mac
 import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 
 
 fun encriptar(datos: String): String {
