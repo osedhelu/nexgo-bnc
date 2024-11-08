@@ -2,11 +2,13 @@ package com.osedhelu.bnc.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
-val Purple40 = Color(0xFF3463F1)
-val PurpleGrey40 = Color(0xFF9FA2A2)
-val Pink40 = Color(0xFF7D5260)
-val primary001 = Color(0xFF31448A)
+val primary: Color = Color(0xFF275FC1)
+val secondary: Color = Color(0xFF03DAC6)
+val success: Color = Color(0xFF4CAF50)
+val danger: Color = Color(0xFFF44336)
+val warning: Color = Color(0xFFFFEB3B)
+val info: Color = Color(0xFF2196F3)
+val dark: Color = Color(0xFF212121)
+val light: Color = Color(0xFFF5F5F5)
+val muted: Color = Color(0xFF9E9E9E)
+val white: Color = Color(0xFFFFFFFF)

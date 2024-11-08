@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.osedhelu.bnc.R.drawable.undraw_profile_data_re_v81r
 import com.osedhelu.bnc.R.string.NAME_APP
-import com.osedhelu.bnc.ui.theme.Purple40
+import com.osedhelu.bnc.ui.theme.primary
 
 
 @Composable
@@ -53,7 +53,7 @@ fun MainHeader(btnVolver: Boolean, navController: NavController, onClick: () -> 
                 }, modifier = Modifier.size(30.dp)) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
-                        tint = Purple40,
+                        tint = primary,
                         contentDescription = "Setting"
                     )
                 }
@@ -61,7 +61,7 @@ fun MainHeader(btnVolver: Boolean, navController: NavController, onClick: () -> 
             } else {
                 Text(
                     text = stringResource(id = NAME_APP),
-                    color = Purple40,
+                    color = primary,
                     modifier = Modifier.padding(top = 10.dp, bottom = 5.dp),
                     fontWeight = FontWeight.Bold
                 )
@@ -75,7 +75,7 @@ fun MainHeader(btnVolver: Boolean, navController: NavController, onClick: () -> 
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Menu,
-                        tint = Purple40,
+                        tint = primary,
                         contentDescription = "Setting"
                     )
                 }

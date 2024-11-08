@@ -24,11 +24,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.osedhelu.bnc.R
-import com.osedhelu.bnc.ui.Screens.ReportScreen.ReportHelper
 import com.osedhelu.bnc.ui.Screens.AnnularScreen.AnnulmentHelpers
+import com.osedhelu.bnc.ui.Screens.ReportScreen.ReportHelper
 import com.osedhelu.bnc.ui.Screens.ShoppingScreen.PagoHelper
 import com.osedhelu.bnc.ui.components.Headers.HeaderHelper
-import com.osedhelu.bnc.ui.theme.Purple40
+import com.osedhelu.bnc.ui.theme.primary
 
 
 data class iCardButton(val title: String, val icon: Int, val path: String)
@@ -58,7 +58,7 @@ fun MainScreen(navController: NavController) {
                 .fillMaxWidth(),
                 shape = RoundedCornerShape(10.dp), // Ajusta el radio aquí
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Purple40
+                    containerColor = primary
                 ),
                 elevation = ButtonDefaults.buttonElevation(
                     defaultElevation = 4.dp

@@ -21,7 +21,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.osedhelu.bnc.ui.components.Headers.HeaderHelper
-import com.osedhelu.bnc.ui.theme.Purple40
+import com.osedhelu.bnc.ui.theme.primary
 
 @Composable
 fun HeaderReport(navController: NavController) {
@@ -35,9 +35,7 @@ fun HeaderReport(navController: NavController) {
             HeaderHelper.reset()
         }, modifier = Modifier.size(30.dp)) {
             Icon(
-                imageVector = Icons.Default.ArrowBack,
-                tint = Purple40,
-                contentDescription = "Volver"
+                imageVector = Icons.Default.ArrowBack, tint = primary, contentDescription = "Volver"
             )
         }
 

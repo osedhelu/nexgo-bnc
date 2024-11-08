@@ -104,6 +104,4 @@ class ApiBancoRepositoryImp @Inject constructor(
         makeNetworkCall {
             MiApiDataSource.registerTransaction(body)
         }
-
-
 }

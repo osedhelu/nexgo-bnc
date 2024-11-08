@@ -14,7 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.osedhelu.bnc.ui.Screens.ShoppingScreen.PagoHelper
-import com.osedhelu.bnc.ui.theme.Purple40
+import com.osedhelu.bnc.ui.theme.primary
 
 @Composable
 fun CustomButton(
@@ -54,7 +54,7 @@ fun NumericKeyboard(
         val buttonWidth = (width * .19f).dp
         val heightButton = (height * .08f).dp
         val validAmount = PagoHelper.ValidAmount(num)
-        val actualBackgroundColor = if (validAmount) Purple40 else Color.LightGray
+        val actualBackgroundColor = if (validAmount) primary else Color.LightGray
         val textColor = if (validAmount) Color.White else Color.White
 
 
@@ -85,7 +85,7 @@ fun NumericKeyboard(
                         .fillMaxHeight()
                         .clickable { num += "3" })
                 CustomButton(text = "⌫",
-                    backgroundColor = Purple40,
+                    backgroundColor = primary,
                     modifier = Modifier
                         .width(buttonWidth)
                         .fillMaxHeight()
@@ -113,7 +113,7 @@ fun NumericKeyboard(
                         .fillMaxHeight()
                         .clickable { num += "6" })
                 CustomButton(text = "C",
-                    backgroundColor = Purple40,
+                    backgroundColor = primary,
                     modifier = Modifier
                         .width(buttonWidth)
                         .fillMaxHeight()
@@ -156,7 +156,7 @@ fun NumericKeyboard(
                                 .width(buttonWidth)
                                 .fillMaxHeight()
 
-                                .clickable { onBack() }, backgroundColor = Purple40
+                                .clickable { onBack() }, backgroundColor = primary
                         )
                         CustomButton(text = "0",
                             modifier = Modifier

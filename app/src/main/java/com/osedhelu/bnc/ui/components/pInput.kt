@@ -32,7 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.osedhelu.bnc.R
-import com.osedhelu.bnc.ui.theme.Purple40
+import com.osedhelu.bnc.ui.theme.primary
 
 
 @Composable
@@ -127,7 +127,7 @@ fun ButtonPersonal(
     title: String,
     onClick: () -> Unit,
     enabled: Boolean = true,
-    color: Color = Purple40,
+    color: Color = primary,
     colorText: Color = Color(0xFFFFFFFF),
     modifier: Modifier = Modifier
 ) {
