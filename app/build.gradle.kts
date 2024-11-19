@@ -16,7 +16,7 @@ plugins {
 }
 
 android {
-    namespace = "com.osedhelu.bnc"
+    namespace = "com.disglobal.bnc"
     compileSdk = 34
     val localProperties = loadLocalProperties()
     val getPropertyValue: (String) -> String = { key ->
@@ -25,7 +25,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.osedhelu.bnc"
+        applicationId = "com.disglobal.bnc"
         minSdk = 21
         targetSdk = 33 // Cambiar de 33 a 34
         versionCode = autoIncrementVersionCode()
@@ -33,7 +33,7 @@ android {
 
         configureBuildConfigFields(getPropertyValue)
 
-        testInstrumentationRunner = "com.osedhelu.bnc.HiltTestRunner"
+        testInstrumentationRunner = "com.disglobal.bnc.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
