@@ -9,6 +9,7 @@ import com.osedhelu.bnc.data.remote.dto.GetInfoAffiliatesResp
 import com.osedhelu.bnc.data.remote.dto.ReceiverStatusDTO
 import com.osedhelu.bnc.data.remote.dto.TransacionDtoResp
 import com.osedhelu.bnc.data.remote.dto.makeNetworkCall
+import com.osedhelu.bnc.utils.jsonStringify
 import javax.inject.Inject
 
 
@@ -68,10 +69,12 @@ class ApiBancoRepositoryImp @Inject constructor(
             MiApiDataSource.getBatchSummary(affiliationId)
         }
 
-    override suspend fun getInfoEchoTest(body: EchoTestDto): ApiResponseStatus<EchoTestDtoResp> =
-        makeNetworkCall {
+    override suspend fun getInfoEchoTest(body: EchoTestDto): ApiResponseStatus<EchoTestDtoResp> {
+        println(jsonStringify(body))
+        return makeNetworkCall {
             MiApiDataSource.getInfoEchoTest(body)
         }
+    }
 
     override suspend fun getTransactions(
         merchant: String,

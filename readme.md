@@ -441,13 +441,11 @@ El Bloque de PIN en texto plano es resultado del XOR entre el resultado de un ca
 - El segundo segmento N indica el la cantidad de dígitos, 4-12 (0x4 a 0xC) en el PIN. 
 - Cada uno de los segmentos siguientes contiene un dígito PIN o un valor de relleno 'F'.
 
-```
- 0     1     2     3     4     5     6     7     8     9     A     B     C     D     E     F 
- +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+ 
- | 0   |  N  |  P  |  P  |  P  |  P  | P/F | P/F | P/F | P/F | P/F | P/F | P/F | P/F | P/F | 
- +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
 
-```
+ |0 |  |1 |  |2 |  |3 |  |4 |  |5 |  |6 |   |7 |   |8 |   |9 |   |A |   |B |   |C |   |D |   |E |   | F|
+ |--|--|--|--|--|--|--|--|--|--|--|--|--|---|--|---|--|---|--|---|--|---|--|---|--|---|--|---|--|---|--|
+ |  |0 |  |N |  |P |  |P |  |P |  |P |  |P/F|  |P/F|  |P/F|  |P/F|  |P/F|  |P/F|  |P/F|  |P/F|  |P/F|  | 
+ 
 
 >[!NOTE]
 >Atención
@@ -626,7 +624,8 @@ Largo: 820178
 | C0 | 0A = 10      | 0AEFFF9876543210E00133 |  KSN Data Key   |
 | C1 | 0A = 10      | 0AFFFF9876543210E00020 | KSN Pin Key     |
 | C2 | 820178 = 376 | 8944 ... 353A          | Data cifrada    |
-|La llave recuperada es: 91BE1497 24ADB022 C81CB55E 7303883F | | |
+
+La llave recuperada es: `91BE1497 24ADB022 C81CB55E 7303883F`
 
 
 La data descifrada es:

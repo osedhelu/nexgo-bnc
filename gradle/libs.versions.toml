@@ -22,6 +22,7 @@ compose_version = "1.4.3"
 retrofit = "2.9.0"
 jetbrains = "1.5.31"
 appcompat = "1.7.0"
+splash_screen = "1.0.1"
 
 
 [libraries]
@@ -32,13 +33,15 @@ runtime-rxjava2 = { module = "androidx.compose.runtime:runtime-rxjava2", version
 lottie = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieVersion" }
 retrofit2-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit2-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
-socketio = { module = "io.socket:socket.io-client", version.ref = "versionsocket" }
+#socketio = { module = "io.socket:socket.io-client", version.ref = "versionsocket" }
 jetbrains-kotlin = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "jetbrains" }
 
 #endregion
 
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivity" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splash_screen" }
+
 androidx-compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "androidxComposeCompiler" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }

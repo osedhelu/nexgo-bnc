@@ -1,5 +1,6 @@
 package com.osedhelu.bnc.data.remote.dto
 
+import android.util.Log
 import com.osedhelu.bnc.utils.jsonStringify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -16,6 +17,7 @@ suspend fun <T> makeNetworkCall(
         ApiResponseStatus.Success(call())
     } catch (e: HttpException) {
         val response = e.response()?.errorBody()?.string()
+        Log.d("Error", response.toString())
         if (response.isNullOrBlank()) {
             ApiResponseStatus.Error(jsonStringify(ErrorMessage("Error")))
         } else {

@@ -1,4 +1,4 @@
-package com.osedhelu.bnc.ui.Screens.TestConexionScreen.widget
+package com.osedhelu.bnc.ui.Screens.TestConnectionScreen.widget
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

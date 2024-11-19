@@ -8,5 +8,10 @@ data class EchoTestDto(
 )
 
 data class EchoTestDtoResp(
-    @SerializedName("message") var message: String? = null
+    @SerializedName("message") var message: String? = null,
+    @SerializedName("gestion") var gestion: String? = null,
+    @SerializedName("tmpAtention") var tmpAtention: String? = null,
+    @SerializedName("CVMLimit") var CVMLimit: String? = null,
+    @SerializedName("contactlessLimit") var contactlessLimit: String? = null,
+    @SerializedName("receipt") var receipt: String? = null
 )

@@ -17,16 +17,14 @@ object ApiServiceInterceptor : Interceptor {
         val requestBuilder = request.newBuilder()
         requestBuilder.addHeader("Accept", "*/*")
         requestBuilder.addHeader("Content-Type", "application/json")
+
         println("xxxxxxxxxxxxxURL: ${request.url()}    ===  ${this.BANCO_TOKENOAUTH2 !== null}")
-        println("xxxxxxxxxxxxxURL: ${request.url()}    ===  Basic ${BANCO_TOKENOAUTH2}")
-
-
-
 
         if (this.BANCO_TOKENOAUTH2 !== null) {
             requestBuilder.addHeader("Authorization", "Basic ${BANCO_TOKENOAUTH2}")
         }
 
+        println("xxxxxxxxxxxxxURL: ${request.headers().get("")}    ===  Basic ${BANCO_TOKENOAUTH2}")
         return chain.proceed(requestBuilder.build())
     }
 

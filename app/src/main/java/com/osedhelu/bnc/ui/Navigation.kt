@@ -12,9 +12,9 @@ import com.osedhelu.bnc.ui.Screens.LoginScreen.LoginScreen
 import com.osedhelu.bnc.ui.Screens.MainScreen.MainScreen
 import com.osedhelu.bnc.ui.Screens.MainScreen.ReportScreen
 import com.osedhelu.bnc.ui.Screens.ProfileScreen.ProfileScreen
-import com.osedhelu.bnc.ui.Screens.ProfileScreen.TestConexionScreen
 import com.osedhelu.bnc.ui.Screens.ReportScreen.widget.ReportLayout
 import com.osedhelu.bnc.ui.Screens.ShoppingScreen.PagoScreen
+import com.osedhelu.bnc.ui.Screens.TestConnectionScreen.TestConnectionScreen
 import com.osedhelu.bnc.utils.ConvertToBase64
 
 @Composable
@@ -22,7 +22,6 @@ fun MainNavigation() {
     val navController = rememberNavController()
     val ctx = LocalContext.current
     val commerce = CommerceLocalData.getCommerce(ctx)
-
     if (commerce !== null) {
         val token = ConvertToBase64("${commerce.commerceCode}${commerce.terminalCode}")
         CommerceLocalData.setTokenAuth(ctx, token)
@@ -71,12 +70,14 @@ fun MainNavigation() {
             }
             composable("test_conexion") {
                 MainLayout(navController) {
-                    TestConexionScreen(navController = navController)
+                    TestConnectionScreen(navController = navController)
                 }
             }
         }
     } else {
         LoginScreen()
     }
+
+
 }
 
