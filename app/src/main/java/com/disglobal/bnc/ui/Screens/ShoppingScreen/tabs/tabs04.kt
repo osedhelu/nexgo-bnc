@@ -29,9 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.disglobal.bnc.R
-import com.disglobal.bnc.config.CommerceLocalData
 import com.disglobal.bnc.config.FontSize
 import com.disglobal.bnc.data.remote.dto.AnnulmentDto
+import com.disglobal.bnc.data.remote.dto.GetInfoAffiliatesResp
 import com.disglobal.bnc.ui.Screens.AnnularScreen.AnnulmentHelpers
 import com.disglobal.bnc.ui.Screens.ShoppingScreen.PagoHelper
 import com.disglobal.bnc.ui.components.ButtonPersonal
@@ -49,7 +49,7 @@ fun PagoTab04(navController: NavController) {
         PagoHelper.formResp
     }
     val ctx = LocalContext.current
-    val commerce = CommerceLocalData.getCommerce(ctx)
+    val commerce = GetInfoAffiliatesResp.getCommerce(ctx)
     Text(text = "C", fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
     Spacer(modifier = Modifier.size(33.dp))
@@ -98,7 +98,7 @@ fun PagoTab04(navController: NavController) {
                     fontSize = (FontSize - 3).sp
                 )
                 Text(
-                    text = redidText("${commerce?.commerceCode}"),
+                    text = redidText("${commerce?.taxId}"),
                     color = Color.Black,
                     fontSize = (FontSize - 3).sp
                 )
@@ -117,7 +117,7 @@ fun PagoTab04(navController: NavController) {
                     fontSize = (FontSize - 3).sp
                 )
                 Text(
-                    text = redidText("${commerce?.terminalCode}"),
+                    text = redidText("${commerce?.serial}"),
                     color = Color.Black,
                     fontSize = (FontSize - 3).sp
                 )
@@ -139,7 +139,8 @@ fun PagoTab04(navController: NavController) {
                 )
             }
             Row(
-                modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
@@ -167,12 +168,11 @@ fun PagoTab04(navController: NavController) {
                     )
                     Text(
 
-                        modifier = Modifier
-                            .clickable {
-                                copyToClipboard(ctx, "${formResp.data.rrn}")
-                                ToastHelpers.show("Copiar el número de transacción: ${formResp.data.rrn}")
+                        modifier = Modifier.clickable {
+                            copyToClipboard(ctx, "${formResp.data.rrn}")
+                            ToastHelpers.show("Copiar el número de transacción: ${formResp.data.rrn}")
 
-                            },
+                        },
                         text = "${formResp.data.rrn?.let { redidText(it) }}",
                         color = Color.Black,
                         fontSize = (FontSize - 3).sp
@@ -211,12 +211,13 @@ fun PagoTab04(navController: NavController) {
                 )
 
             }
-            ButtonPersonal(title = "Finalizar", onClick = {})
+            ButtonPersonal(title = "Finalizar", onClick = {
+                navController.navigate("main")
+            })
             if (formResp.ok) {
                 ButtonPersonal(title = "Anular transferencia", onClick = {
                     AnnulmentHelpers.form.value = AnnulmentDto(
-                        receiptId = "${formResp.data.receiptId}",
-                        rrn = "${formResp.data.rrn}"
+                        receiptId = "${formResp.data.receiptId}", rrn = "${formResp.data.rrn}"
                     )
                     PagoHelper.nextTabs()
 

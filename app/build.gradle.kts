@@ -91,7 +91,7 @@ dependencies {
     implementation(composeBom)
     androidTestImplementation(composeBom)
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar"))))
-    implementation(files("libs/nexgo-smartpos-sdk-v2.2.1_20190527.aar"))
+    implementation(files("libs/nexgo-smartpos-sdk-v3.08.002_20240410.aar"))
 //    implementation(libs.socketio)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.runtime)

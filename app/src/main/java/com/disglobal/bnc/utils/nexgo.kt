@@ -10,10 +10,10 @@ import androidx.annotation.RequiresApi
 import com.disglobal.bnc.nexgobnc
 import com.disglobal.bnc.R
 import com.disglobal.bnc.config.iValueCardTransacion
-import com.disglobal.bnc.config.CommerceLocalData
 import com.disglobal.bnc.config.SERIAL_DEFAULT
 import com.disglobal.bnc.data.local.database.TransCount
 import com.disglobal.bnc.data.local.database.TransactionTableDB
+import com.disglobal.bnc.data.remote.dto.GetInfoAffiliatesResp
 import com.nexgo.common.ByteUtils
 import com.nexgo.common.LogUtils
 import com.nexgo.oaf.apiv3.SdkResult
@@ -114,7 +114,7 @@ fun PrintFacture(context: Context) {
 }
 
 fun PrintFacturaDetails(context: Context, details: iValueCardTransacion) {
-    val commerce = CommerceLocalData.getCommerce(context)
+    val commerce = GetInfoAffiliatesResp.getCommerce(context)
     try {
         var deviceEngine = (context.applicationContext as nexgobnc).deviceEngine
         var printer: Printer? = deviceEngine!!.printer
@@ -129,10 +129,10 @@ fun PrintFacturaDetails(context: Context, details: iValueCardTransacion) {
         printer!!.setLetterSpacing(0) //change the line space between each line
         printer!!.setGray(GrayLevelEnum.LEVEL_2) //change print gray
         printer!!.appendPrnStr(
-            "${commerce?.nameCommerce}", FONT_SIZE_NORMAL, AlignEnum.CENTER, false
+            "${commerce?.name}", FONT_SIZE_NORMAL, AlignEnum.CENTER, false
         )
         printer!!.appendPrnStr(
-            "${context.getString(R.string.rif)}: ${commerce?.rif}",
+            "${context.getString(R.string.rif)}: ${commerce?.taxId}",
             FONT_SIZE_NORMAL,
             AlignEnum.CENTER,
             false
@@ -196,7 +196,7 @@ fun PrintFacturaDetails(context: Context, details: iValueCardTransacion) {
 }
 
 fun PrintFactureTransaction(context: Context, resp: TransactionTableDB) {
-    val commerce = CommerceLocalData.getCommerce(context)
+    val commerce = GetInfoAffiliatesResp.getCommerce(context)
     try {
         var deviceEngine = (context.applicationContext as nexgobnc).deviceEngine
         var printer: Printer? = deviceEngine!!.printer
@@ -212,10 +212,10 @@ fun PrintFactureTransaction(context: Context, resp: TransactionTableDB) {
         printer!!.setLetterSpacing(3) //change the line space between each line
         printer!!.setGray(GrayLevelEnum.LEVEL_2) //change print gray
         printer!!.appendPrnStr(
-            "${commerce?.let { it.nameCommerce }}", FONT_SIZE_NORMAL, AlignEnum.CENTER, false
+            "${commerce?.let { it.name }}", FONT_SIZE_NORMAL, AlignEnum.CENTER, false
         )
         printer!!.appendPrnStr(
-            "${context.getString(R.string.rif)}: ${commerce?.let { it.rif }}",
+            "${context.getString(R.string.rif)}: ${commerce?.let { it.taxId }}",
             FONT_SIZE_NORMAL,
             AlignEnum.CENTER,
             false
@@ -293,7 +293,7 @@ fun PrintFactureTransaction(context: Context, resp: TransactionTableDB) {
 }
 
 fun PrintDetailsConsolidadoDiario(context: Context, details: TransCount) {
-    val commerce = CommerceLocalData.getCommerce(context)
+    val commerce = GetInfoAffiliatesResp.getCommerce(context)
     try {
         var deviceEngine = (context.applicationContext as nexgobnc).deviceEngine
         var printer: Printer? = deviceEngine!!.printer
@@ -308,10 +308,10 @@ fun PrintDetailsConsolidadoDiario(context: Context, details: TransCount) {
         printer!!.setLetterSpacing(0) //change the line space between each line
         printer!!.setGray(GrayLevelEnum.LEVEL_2) //change print gray
         printer!!.appendPrnStr(
-            "${commerce?.nameCommerce}", FONT_SIZE_NORMAL, AlignEnum.CENTER, false
+            "${commerce?.name}", FONT_SIZE_NORMAL, AlignEnum.CENTER, false
         )
         printer!!.appendPrnStr(
-            "${context.getString(R.string.rif)}: ${commerce?.rif}",
+            "${context.getString(R.string.rif)}: ${commerce?.taxId}",
             FONT_SIZE_NORMAL,
             AlignEnum.CENTER,
             false
@@ -390,7 +390,7 @@ fun PrintDetailsConsolidadoDiario(context: Context, details: TransCount) {
 fun PrintFactureTransactionValidarPago(
     context: Context, resp: TransactionTableDB, typeState: String
 ) {
-    val commerce = CommerceLocalData.getCommerce(context)
+    val commerce = GetInfoAffiliatesResp.getCommerce(context)
     try {
         val deviceEngine = (context.applicationContext as nexgobnc).deviceEngine
         val printer: Printer? = deviceEngine!!.printer
@@ -407,10 +407,10 @@ fun PrintFactureTransactionValidarPago(
         printer!!.setLetterSpacing(3) //change the line space between each line
         printer!!.setGray(GrayLevelEnum.LEVEL_2) //change print gray
         printer!!.appendPrnStr(
-            "${commerce?.let { it.nameCommerce }}", FONT_SIZE_NORMAL, AlignEnum.CENTER, false
+            "${commerce?.let { it.name }}", FONT_SIZE_NORMAL, AlignEnum.CENTER, false
         )
         printer!!.appendPrnStr(
-            "${context.getString(R.string.rif)}: ${commerce?.let { it.rif }}",
+            "${context.getString(R.string.rif)}: ${commerce?.let { it.taxId }}",
             FONT_SIZE_NORMAL,
             AlignEnum.CENTER,
             false

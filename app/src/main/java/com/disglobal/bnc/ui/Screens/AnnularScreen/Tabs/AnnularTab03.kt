@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.disglobal.bnc.R
-import com.disglobal.bnc.config.CommerceLocalData
+import com.disglobal.bnc.data.remote.dto.GetInfoAffiliatesResp
 import com.disglobal.bnc.ui.Screens.AnnularScreen.AnnulmentHelpers
 import com.disglobal.bnc.ui.components.ButtonPersonal
 import com.disglobal.bnc.ui.components.RowItems
@@ -33,7 +33,7 @@ fun AnnularTab03(onClick: () -> Unit) {
         AnnulmentHelpers.formResp
     }
     val ctx = LocalContext.current
-    val commerce = CommerceLocalData.getCommerce(ctx)
+    val commerce = GetInfoAffiliatesResp.getCommerce(ctx)
     Text(text = "Detalles de la anulación", fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
     Spacer(modifier = Modifier.size(33.dp))
@@ -57,9 +57,9 @@ fun AnnularTab03(onClick: () -> Unit) {
             RowItems(R.string.statuscode, "${form.statusCode}")
             RowItems(R.string.paymendetails, "${form.statusDescription}")
 //      _____________________________________________________________________________________________
-            RowItems(R.string.code_commerce, redidText("${commerce?.commerceCode}"))
+            RowItems(R.string.code_commerce, redidText("${commerce?.taxId}"))
 //      _____________________________________________________________________________________________
-            RowItems(R.string.code_terminal, redidText("${commerce?.terminalCode}"))
+            RowItems(R.string.code_terminal, redidText("${commerce?.serial}"))
             ButtonPersonal(title = "Finalizar", onClick = onClick)
         }
     }

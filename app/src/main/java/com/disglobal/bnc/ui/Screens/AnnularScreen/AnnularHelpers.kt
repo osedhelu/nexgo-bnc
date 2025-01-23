@@ -11,6 +11,7 @@ object AnnulmentHelpers : ViewModel() {
     val form: MutableState<AnnulmentDto> = mutableStateOf(AnnulmentDto("", ""))
     val formResp: MutableState<AnnulmentRespDto> = mutableStateOf(AnnulmentRespDto("", ""))
     val numTab: MutableState<Int> = mutableStateOf(0)
+    val showDialog: MutableState<Boolean> = mutableStateOf(false)
 
     @Synchronized
     fun reset() {

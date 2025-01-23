@@ -21,7 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.disglobal.bnc.R
-import com.disglobal.bnc.config.CommerceLocalData
+import com.disglobal.bnc.data.remote.dto.GetInfoAffiliatesResp
 import com.disglobal.bnc.utils.GoToActivity
 import com.disglobal.bnc.utils.iNameActivity
 
@@ -30,7 +30,7 @@ import com.disglobal.bnc.utils.iNameActivity
 fun LoginLayout(children: @Composable () -> Unit) {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         val ctx = LocalContext.current
-        val commerce = CommerceLocalData.getCommerce(ctx)
+        val commerce = GetInfoAffiliatesResp.getCommerce(ctx)
 
 
         Row(
@@ -52,7 +52,10 @@ fun LoginLayout(children: @Composable () -> Unit) {
                 Spacer(modifier = Modifier.size(30.dp))
             } else {
                 IconButton(onClick = {
-                    CommerceLocalData.setCommerce(ctx, CommerceLocalData(0, "", "", "", "", ""))
+                    GetInfoAffiliatesResp.setCommerce(
+                        ctx,
+                        GetInfoAffiliatesResp()
+                    )
                     GoToActivity(iNameActivity.MAIN, ctx)
                 }) {
                     Icon(imageVector = Icons.Default.Clear, contentDescription = "")

@@ -5,7 +5,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.disglobal.bnc.config.CommerceLocalData
+import com.disglobal.bnc.data.remote.dto.GetInfoAffiliatesResp
 import com.disglobal.bnc.ui.Layouts.MainLayout
 import com.disglobal.bnc.ui.Screens.AnnularScreen.AnnularScreen
 import com.disglobal.bnc.ui.Screens.LoginScreen.LoginScreen
@@ -21,10 +21,10 @@ import com.disglobal.bnc.utils.ConvertToBase64
 fun MainNavigation() {
     val navController = rememberNavController()
     val ctx = LocalContext.current
-    val commerce = CommerceLocalData.getCommerce(ctx)
+    val commerce = GetInfoAffiliatesResp.getCommerce(ctx)
     if (commerce !== null) {
-        val token = ConvertToBase64("${commerce.commerceCode}${commerce.terminalCode}")
-        CommerceLocalData.setTokenAuth(ctx, token)
+//        val token = ConvertToBase64("${commerceId.commerceCode}${commerce.terminalCode}")
+//        CommerceLocalData.setTokenAuth(ctx, token)
         NavHost(navController = navController, startDestination = "main") {
             composable("main") {
                 MainLayout(navController = navController, logoCenter = true) {

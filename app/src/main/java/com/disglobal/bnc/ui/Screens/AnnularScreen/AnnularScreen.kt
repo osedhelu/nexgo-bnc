@@ -13,6 +13,7 @@ import androidx.navigation.NavController
 import com.disglobal.bnc.ui.Screens.AnnularScreen.Tabs.AnnularTab01
 import com.disglobal.bnc.ui.Screens.AnnularScreen.Tabs.AnnularTab02
 import com.disglobal.bnc.ui.Screens.AnnularScreen.Tabs.AnnularTab03
+import com.disglobal.bnc.ui.Screens.ShoppingScreen.tabs.TypeMethodCard
 import com.disglobal.bnc.ui.components.Headers.HeaderHelper
 
 @Composable
@@ -29,7 +30,11 @@ fun AnnularScreen(navController: NavController) {
     ) {
 
         when (numTab) {
-            0 -> AnnularTab01()
+//            0 -> AnnularTab01()
+            0 -> {
+                TypeMethodCard(navController = navController)
+            }
+
             1 -> AnnularTab02(onClick = {
 //                viewModel.AnnulmentPayment("${token}") {
 //                    lifecycleOwner.lifecycleScope.launch {

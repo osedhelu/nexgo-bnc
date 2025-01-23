@@ -22,7 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.disglobal.bnc.R
-import com.disglobal.bnc.config.CommerceLocalData
 import com.disglobal.bnc.ui.Screens.AnnularScreen.AnnulmentHelpers
 import com.disglobal.bnc.ui.components.ButtonPersonal
 import com.disglobal.bnc.ui.components.RowItems
@@ -33,8 +32,6 @@ fun AnnularTab02(onClick: () -> Unit) {
     val form by remember {
         AnnulmentHelpers.form
     }
-    val ctx = LocalContext.current
-    val commerce = CommerceLocalData.getCommerce(ctx)
     Text(
         text = stringResource(id = R.string.title_annulment),
         fontSize = 24.sp,

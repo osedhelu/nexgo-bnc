@@ -18,8 +18,6 @@ interface ApiBancoRepository {
     suspend fun getInfoAffiliation(
         taxId: String,
         serial: String,
-        appName: String,
-        appVersion: String
     ): ApiResponseStatus<GetInfoAffiliatesResp>
 
     suspend fun getBatchSummary(affiliationId: String): ApiResponseStatus<String>
@@ -58,10 +56,8 @@ class ApiBancoRepositoryImp @Inject constructor(
     override suspend fun getInfoAffiliation(
         taxId: String,
         serial: String,
-        appName: String,
-        appVersion: String
     ) = makeNetworkCall {
-        MiApiDataSource.getInfoAffiliation(taxId, serial, appName, appVersion)
+        MiApiDataSource.getInfoAffiliation(taxId, serial, "com.transactions.demo", "0.0.1-DEBUG")
     }
 
     override suspend fun getBatchSummary(affiliationId: String): ApiResponseStatus<String> =

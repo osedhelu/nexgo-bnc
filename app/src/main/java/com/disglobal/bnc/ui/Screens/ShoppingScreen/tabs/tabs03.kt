@@ -31,7 +31,7 @@ fun PagoTab03(navController: NavController) {
         }
         Spacer(modifier = Modifier.size(20.dp))
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { navController.navigate("main") },
             modifier = Modifier
                 .fillMaxWidth()
                 .shadow(

@@ -33,7 +33,7 @@ interface BancoDataSource {
 //    suspend fun AnnulmentPayment(@Body body: AnnulmentDto): AnnulmentRespDto
 
 
-    @GET("$GET_INFO_AFFILIATION/:taxId/:serial")
+    @GET("$GET_INFO_AFFILIATION/{taxId}/{serial}")
     suspend fun getInfoAffiliation(
         @Path("taxId") taxId: String,
         @Path("serial") serial: String,
