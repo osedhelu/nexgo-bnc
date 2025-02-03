@@ -3,69 +3,109 @@ package com.disglobal.bnc.tvldecoder.utils
 import com.disglobal.bnc.tvldecoder.model.Tlv
 import com.disglobal.bnc.tvldecoder.store.EMVTagStore
 
-class TlvDecoder {
-    companion object {
-        private val TAG_LENGTHS = listOf(6, 4, 2)
-        private const val MAX_TAG_LENGTH = 6
+object TlvDecoder {
 
-        fun parseString(hexString: String): MutableList<Tlv> {
-            val tlvList = mutableListOf<Tlv>()
-            var remaining = hexString
+    /**
+     * Función para analizar una cadena TLV y extraer tags, longitud y valores.
+     */
+    fun parseString(hexString: String): List<Tlv> {
+        val tlvList = mutableListOf<Tlv>()
+        var remaining = hexString
 
-            while (remaining.length >= 4) {
-                val tag = detectTag(remaining) ?: break
-                remaining = remaining.substring(tag.length)
+        while (remaining.isNotEmpty()) {
+            // Detectar el tag
+            val tag = detectTag(remaining)
+            if (tag.isEmpty()) break // Evita salir antes de procesar todo
 
-                if (remaining.length < 2) break
+            remaining = remaining.substring(tag.length)
 
-                val (lengthValue, bytesConsumed) = parseLength(remaining) ?: break
-                remaining = remaining.substring(bytesConsumed * 2)
-
-                val totalValueLength = lengthValue * 2
-                if (remaining.length < totalValueLength) break
-
-                val value = remaining.substring(0, totalValueLength)
-                remaining = remaining.substring(totalValueLength)
-
-                tlvList.add(createTlv(tag, value))
+            // Verificar que haya datos suficientes para la longitud
+            if (remaining.length < 2) {
+                println("Error: No hay suficiente información para leer la longitud del tag $tag")
+                break
             }
 
-            return tlvList
+            // Obtener la longitud del valor
+            val (lengthValue, lengthBytes) = parseLength(remaining)
+            remaining = remaining.substring(lengthBytes * 2)
+
+            // Verificar que haya suficientes caracteres para el valor
+            if (remaining.length < lengthValue * 2) {
+                println("Error: No hay suficientes datos para el tag $tag")
+                break
+            }
+
+            val valueHex = remaining.substring(0, lengthValue * 2)
+            remaining = remaining.substring(lengthValue * 2)
+
+            // Obtener el nombre del tag desde el EMVTagStore
+            val tagName = EMVTagStore.emvMap[tag]?.name ?: "Unknown"
+
+            // Agregar el tag a la lista
+            tlvList.add(Tlv(tag, tagName, valueHex, valueHex.length))
         }
 
-        private fun detectTag(input: String): String? {
-            return TAG_LENGTHS.firstOrNull { length ->
-                length <= input.length && EMVTagStore.emvMap.containsKey(input.substring(0, length))
-            }?.let { input.substring(0, it) }
-        }
+        return tlvList
+    }
 
-        private fun parseLength(input: String): Pair<Int, Int>? {
-            return when (val firstByte = HexConversion.ToInt(input.substring(0..1))) {
-                in 0..127 -> Pair(firstByte, 1)
-                0x81 -> if (input.length >= 4) Pair(
-                    HexConversion.ToInt(input.substring(2..3)),
-                    2
-                ) else null
 
-                0x82 -> if (input.length >= 6) Pair(
-                    HexConversion.ToInt(input.substring(2..5)),
-                    3
-                ) else null
+    /**
+     * Función para detectar el tag (1 o 2 bytes).
+     */
+    private fun detectTag(input: String): String {
+        if (input.length < 2) return ""
 
-                else -> null
+        // Ordenar los tags de mayor a menor longitud
+        val sortedKeys = EMVTagStore.emvMap.keys.sortedByDescending { it.length }
+        for (key in sortedKeys) {
+            if (input.startsWith(key, ignoreCase = true)) {
+                return key
             }
         }
 
-        private fun createTlv(tag: String, value: String): Tlv {
-            val emvTag = EMVTagStore.emvMap[tag]
-            val decodedValue = if (emvTag?.encoded == true) HexConversion.ToAscii(value) else value
+        // Si no está en el EMVTagStore, intentar identificarlo manualmente
+        val firstByte = input.substring(0, 2).uppercase()
+        return when {
+            firstByte == "DF" && input.length >= 6 -> input.substring(0, 6)  // Tags de 3 bytes (DF83xx)
+            firstByte == "DF" && input.length >= 4 -> input.substring(0, 4)  // Tags de 2 bytes (DFxx)
+            firstByte == "9F" && input.length >= 4 -> input.substring(0, 4)  // Tags de 2 bytes (9Fxx)
+            else -> firstByte
+        }
+    }
+    private fun parseLength(input: String): Pair<Int, Int> {
+        if (input.length < 2) return Pair(0, 1)
 
-            return Tlv(
-                tag = tag,
-                tagName = emvTag?.name ?: "Unknown",
-                value = decodedValue,
-                hexValueLength = value.length
-            )
+        val firstByte = input.substring(0, 2).toInt(16)
+        return when {
+            firstByte < 0x80 -> Pair(firstByte, 1)
+            firstByte == 0x81 -> Pair(input.substring(2, 4).toInt(16), 2)
+            firstByte == 0x82 -> Pair(input.substring(2, 6).toInt(16), 3)
+            else -> {
+                println("Error: Longitud inválida en TLV")
+                Pair(0, 1)
+            }
+        }
+    }
+
+    fun buildTLV(tlvList: List<Tlv>): String {
+        val stringBuilder = StringBuilder()
+
+        for (tlv in tlvList) {
+            val lengthHex = tlv.value.length.div(2).toString(16).padStart(2, '0')
+            stringBuilder.append(tlv.tag).append(lengthHex).append(tlv.value)
+        }
+
+        return stringBuilder.toString().uppercase()
+    }
+
+    /**
+     * Función para imprimir los resultados en formato tabla.
+     */
+    fun printResults(tlvList: List<Tlv>) {
+        println("| Tag     | Tag name                                  | Value (Hex)                                                 |")
+        println("|---------|-------------------------------------------|-------------------------------------------------------------|")
+        tlvList.forEach { tlv ->
+            println("| ${tlv.tag.padEnd(8)} | ${tlv.tagName.padEnd(41)} | ${tlv.value} |")
         }
     }
 }
