@@ -15,7 +15,10 @@ object TlvDecoder {
         while (remaining.isNotEmpty()) {
             // Detectar el tag
             val tag = detectTag(remaining)
-            if (tag.isEmpty()) break // Evita salir antes de procesar todo
+            if (tag.isEmpty()) {
+                println("Error: No se pudo detectar un tag en la cadena restante: $remaining")
+                break
+            }
 
             remaining = remaining.substring(tag.length)
 
@@ -66,20 +69,31 @@ object TlvDecoder {
         // Si no está en el EMVTagStore, intentar identificarlo manualmente
         val firstByte = input.substring(0, 2).uppercase()
         return when {
-            firstByte == "DF" && input.length >= 6 -> input.substring(0, 6)  // Tags de 3 bytes (DF83xx)
-            firstByte == "DF" && input.length >= 4 -> input.substring(0, 4)  // Tags de 2 bytes (DFxx)
-            firstByte == "9F" && input.length >= 4 -> input.substring(0, 4)  // Tags de 2 bytes (9Fxx)
+            firstByte == "DF" && input.length >= 6 -> input.substring(
+                0, 6
+            )  // Tags de 3 bytes (DF83xx)
+            firstByte == "DF" && input.length >= 4 -> input.substring(
+                0, 4
+            )  // Tags de 2 bytes (DFxx)
+            firstByte == "9F" && input.length >= 4 -> input.substring(
+                0, 4
+            )  // Tags de 2 bytes (9Fxx)
             else -> firstByte
         }
     }
+
     private fun parseLength(input: String): Pair<Int, Int> {
         if (input.length < 2) return Pair(0, 1)
 
         val firstByte = input.substring(0, 2).toInt(16)
         return when {
-            firstByte < 0x80 -> Pair(firstByte, 1)
-            firstByte == 0x81 -> Pair(input.substring(2, 4).toInt(16), 2)
-            firstByte == 0x82 -> Pair(input.substring(2, 6).toInt(16), 3)
+            firstByte < 0x80 -> Pair(firstByte, 1)  // Longitud de 1 byte
+            firstByte == 0x81 && input.length >= 4 -> Pair(
+                input.substring(2, 4).toInt(16), 2
+            )  // Longitud de 2 bytes
+            firstByte == 0x82 && input.length >= 6 -> Pair(
+                input.substring(2, 6).toInt(16), 3
+            )  // Longitud de 3 bytes
             else -> {
                 println("Error: Longitud inválida en TLV")
                 Pair(0, 1)
