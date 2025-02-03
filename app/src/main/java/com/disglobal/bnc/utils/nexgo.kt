@@ -7,13 +7,13 @@ import android.graphics.Typeface
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import com.disglobal.bnc.nexgobnc
 import com.disglobal.bnc.R
-import com.disglobal.bnc.config.iValueCardTransacion
 import com.disglobal.bnc.config.SERIAL_DEFAULT
+import com.disglobal.bnc.config.iValueCardTransacion
 import com.disglobal.bnc.data.local.database.TransCount
 import com.disglobal.bnc.data.local.database.TransactionTableDB
 import com.disglobal.bnc.data.remote.dto.GetInfoAffiliatesResp
+import com.disglobal.bnc.nexgobnc
 import com.nexgo.common.ByteUtils
 import com.nexgo.common.LogUtils
 import com.nexgo.oaf.apiv3.SdkResult
@@ -28,7 +28,8 @@ import com.nexgo.oaf.apiv3.device.reader.CardInfoEntity
 import com.nexgo.oaf.apiv3.device.reader.CardSlotTypeEnum
 import com.nexgo.oaf.apiv3.device.reader.OnCardInfoListener
 import java.text.DecimalFormat
-import java.util.*
+import java.util.Locale
+
 
 fun getSerialPost(context: Context): String {
     return try {
@@ -585,3 +586,14 @@ fun ConverString(e: String, init: Int = 3, fin: Int = 2): String {
         return e
     }
 }
+
+//fun readCardEMV(ctx: Context) {
+//    try {
+//        val deviceEngine = (ctx.applicationContext as nexgobnc).deviceEngine
+//        deviceEngine.ultralightEV1CardHandler
+//
+//    } catch (e: Exception) {
+//        println("xxxxxx ${e.message}")
+//    }
+//
+//}

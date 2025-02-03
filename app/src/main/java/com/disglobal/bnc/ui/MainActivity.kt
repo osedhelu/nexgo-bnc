@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.disglobal.bnc.ui.theme.MyApplicationTheme
+import com.disglobal.bnc.utils.EmvCardReader
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,6 +42,7 @@ class MainActivity : ComponentActivity() {
             delay(100L)
             splashScreen.setKeepOnScreenCondition { false }
         }
+        EmvCardReader(this).startEmvCardDetection()
         setContent {
             MyApplicationTheme {
                 IsConnectedScreen {
