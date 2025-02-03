@@ -10,7 +10,7 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
-          SLACK_ICON: https://canny.io/images/c10da7fa9b0d090bab66799c326e1c91.png
-          SLACK_USERNAME: Build Strapi Dis-global
+          SLACK_ICON: https://play-lh.googleusercontent.com/zFyQFfph9_nTAXzXhVlnVbqh8-4PrXG9n7RQQ7e5aYtVnMCJA0cA5I3TuQ-TZni81KCg
+          SLACK_USERNAME: Build Dis-global
           SLACK_WEBHOOK: https://hooks.slack.com/services/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
           SLACK_TITLE: 'osedhelu support deployment on main'
