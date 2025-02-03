@@ -3,64 +3,69 @@ package com.disglobal.bnc.tvldecoder.utils
 import com.disglobal.bnc.tvldecoder.model.Tlv
 import com.disglobal.bnc.tvldecoder.store.EMVTagStore
 
-/**
- * Created by Roy on 2/20/18.
- */
 class TlvDecoder {
-
     companion object {
+        private val TAG_LENGTHS = listOf(6, 4, 2)
+        private const val MAX_TAG_LENGTH = 6
 
-        val lengthTagLength = 2
-        var tlvList: MutableList<Tlv> = mutableListOf<Tlv>()
+        fun parseString(hexString: String): MutableList<Tlv> {
+            val tlvList = mutableListOf<Tlv>()
+            var remaining = hexString
 
-        fun parseString(stringToDecode: String): MutableList<Tlv> {
-            if (stringToDecode.isEmpty()) return tlvList
-            if (stringToDecode.length < 4) {
-                tlvList.add(createFailedToParseTlvTag(stringToDecode))
-                return tlvList
+            while (remaining.length >= 4) {
+                val tag = detectTag(remaining) ?: break
+                remaining = remaining.substring(tag.length)
+
+                if (remaining.length < 2) break
+
+                val (lengthValue, bytesConsumed) = parseLength(remaining) ?: break
+                remaining = remaining.substring(bytesConsumed * 2)
+
+                val totalValueLength = lengthValue * 2
+                if (remaining.length < totalValueLength) break
+
+                val value = remaining.substring(0, totalValueLength)
+                remaining = remaining.substring(totalValueLength)
+
+                tlvList.add(createTlv(tag, value))
             }
-            var stringToParse = stringToDecode
-            val mediumTag = stringToParse.substring(0..3)
-            val smallTag = stringToParse.substring(0..1)
-            val tlv: Tlv
-
-            tlv = if (EMVTagStore.emvMap.containsKey(mediumTag)) createTlv(stringToParse, mediumTag)
-            else createTlv(stringToParse, smallTag)
-
-            stringToParse = stringToParse.substring(tlv.tag.length + lengthTagLength + tlv.hexValueLength)
-            tlvList.add(tlv)
-
-            if (stringToParse.isNotEmpty()) parseString(stringToParse)
 
             return tlvList
         }
 
-        private fun createTlv(stringToParse: String, tag: String): Tlv {
-            val remainingString = stringToParse.substring(tag.length)
-            val emvTag = EMVTagStore.emvMap.get(tag)
-            val tlvValue = remainingString.substring(2, getValueLength(remainingString))
-
-            return Tlv(tag, emvTag?.name ?: "Unknown Tag",
-                if (emvTag?.encoded ?: false) HexConversion.ToAscii(tlvValue) else tlvValue,
-                tlvValue.length)
+        private fun detectTag(input: String): String? {
+            return TAG_LENGTHS.firstOrNull { length ->
+                length <= input.length && EMVTagStore.emvMap.containsKey(input.substring(0, length))
+            }?.let { input.substring(0, it) }
         }
 
-        private fun getValueLength(remainingString: String): Int =
-            HexConversion.ToInt(remainingString.substring(0..1)) + lengthTagLength
+        private fun parseLength(input: String): Pair<Int, Int>? {
+            return when (val firstByte = HexConversion.ToInt(input.substring(0..1))) {
+                in 0..127 -> Pair(firstByte, 1)
+                0x81 -> if (input.length >= 4) Pair(
+                    HexConversion.ToInt(input.substring(2..3)),
+                    2
+                ) else null
 
-        private fun createFailedToParseTlvTag(stringToParse: String): Tlv {
-            return Tlv("", "Failed to Parse",
-                stringToParse, 0)
-        }
+                0x82 -> if (input.length >= 6) Pair(
+                    HexConversion.ToInt(input.substring(2..5)),
+                    3
+                ) else null
 
-        private fun isLengthValid(stringToParse: String): Boolean {
-            if (stringToParse.length >= 2) {
-                val length = HexConversion.ToInt(stringToParse.substring(0, 2))
-                return (length >= stringToParse.length - 2)
+                else -> null
             }
-            return false
         }
 
-    }
+        private fun createTlv(tag: String, value: String): Tlv {
+            val emvTag = EMVTagStore.emvMap[tag]
+            val decodedValue = if (emvTag?.encoded == true) HexConversion.ToAscii(value) else value
 
+            return Tlv(
+                tag = tag,
+                tagName = emvTag?.name ?: "Unknown",
+                value = decodedValue,
+                hexValueLength = value.length
+            )
+        }
+    }
 }
