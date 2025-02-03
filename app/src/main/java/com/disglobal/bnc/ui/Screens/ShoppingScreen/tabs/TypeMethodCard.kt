@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -27,12 +28,15 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.disglobal.bnc.ui.Screens.ShoppingScreen.PagoHelper
+import com.disglobal.bnc.ui.Screens.ShoppingScreen.providers.PaymentProvider
 import com.disglobal.bnc.ui.components.Loading.IconType
 import com.disglobal.bnc.utils.convertirANumeroDecimal
 import kotlinx.coroutines.delay
 
 @Composable
-fun TypeMethodCard(navController: NavController) {
+fun TypeMethodCard(
+    navController: NavController,
+) {
     val form by remember {
         PagoHelper.form
     }
@@ -48,7 +52,9 @@ fun TypeMethodCard(navController: NavController) {
         composition, iterations = LottieConstants.IterateForever
     )
     LaunchedEffect(true) {
-        delay(10000L) // 20 seconds delay
+
+        delay(1000L) // 20 seconds delay
+
         if (amount > 20) {
             navController.navigate("compras/4") // Replace with the actual route of the next screen
         } else {

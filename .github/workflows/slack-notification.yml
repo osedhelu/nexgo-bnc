@@ -1,0 +1,16 @@
+name: Telegram Notification
+
+on: [push]
+
+jobs:
+  send-message:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
+          SLACK_ICON: https://canny.io/images/c10da7fa9b0d090bab66799c326e1c91.png
+          SLACK_USERNAME: Build Strapi Dis-global
+          SLACK_WEBHOOK: https://hooks.slack.com/services/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
+          SLACK_TITLE: 'osedhelu support deployment on main'

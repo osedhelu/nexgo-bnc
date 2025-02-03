@@ -11,10 +11,13 @@ import com.disglobal.bnc.data.remote.dto.AnnulmentRespDto
 import com.disglobal.bnc.data.remote.dto.EchoTestDto
 import com.disglobal.bnc.data.remote.dto.EchoTestDtoResp
 import com.disglobal.bnc.data.remote.dto.GetInfoAffiliatesResp
+import com.disglobal.bnc.data.remote.dto.LotSummaryResponse
 import com.disglobal.bnc.data.remote.dto.PaymentDto
 import com.disglobal.bnc.data.remote.dto.PaymentRespDto
 import com.disglobal.bnc.data.remote.dto.ReceiverStatusDTO
 import com.disglobal.bnc.data.remote.dto.TransacionDtoResp
+import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
@@ -44,7 +47,7 @@ interface BancoDataSource {
     @GET(BATCH_SUMMARY)
     suspend fun getBatchSummary(
         @Query("affiliationId") appName: String,
-    ): String
+    ): LotSummaryResponse
 
     @POST(ECHO_TEST)
     suspend fun getInfoEchoTest(@Body body: EchoTestDto): EchoTestDtoResp
@@ -70,9 +73,12 @@ interface BancoDataSource {
         @Query("signature") signature: Boolean
     )
 
-    @Headers("Content-Type: text/plain;charset=UTF-8")
+    @Headers(
+        "Accept: */*",
+        "Content-Type: text/plain"
+    )
     @POST(PATH_GET_TRANSACTION)
-    suspend fun registerTransaction(@Body body: String): String
+    suspend fun registerTransaction(@Body body: RequestBody): ResponseBody
 
     @GET(PATH_RECEIVER_STATUS)
     suspend fun receiverStatus(): ReceiverStatusDTO

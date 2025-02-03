@@ -7,14 +7,8 @@ const val PRICE_VALIDATE = 1000
 //Backend BANCK
 const val SERIAL_DEFAULT = "1234567"
 const val BASEURL = BuildConfig.baseUrl
-const val APPNAME = BuildConfig.appName
-const val APPVERSION = BuildConfig.appVersion
-const val KSN = BuildConfig.ksn
 const val AFFILIATION_ID = BuildConfig.affiliationId
-const val USER_ID = BuildConfig.userId
-const val MERCHANT = BuildConfig.merchant
-const val TERMINAL = BuildConfig.terminal
-const val LOT_NUMBER = BuildConfig.lotNumber
+
 
 // endpoints api
 const val GET_INFO_AFFILIATION = "/api-echo/v1/resumen"

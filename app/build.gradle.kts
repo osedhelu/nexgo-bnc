@@ -87,6 +87,9 @@ android {
 dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0-alpha01") // Actualizar a una versión compatible
     implementation("androidx.core:core-ktx:1.13.0-alpha01") // Actualizar a una versión compatible
+    implementation("com.android.support:appcompat-v7:26.1.0")
+    implementation("com.android.support.constraint:constraint-layout:1.0.2")
+    implementation("com.android.support:recyclerview-v7:26.1.0")
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -106,6 +109,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    debugImplementation(libs.okhttp3)
+
 
     // Hilt Dependency Injection
     implementation(libs.hilt.android)

@@ -11,7 +11,6 @@ import com.disglobal.bnc.ui.Screens.ShoppingScreen.tabs.TypeMethodCard
 
 @Composable
 fun PagoScreen(navController: NavController, numTab: Int = 1) {
-    print("numTab: $numTab")
     when (numTab) {
         1 -> {
             PagoTab01(navController = navController)

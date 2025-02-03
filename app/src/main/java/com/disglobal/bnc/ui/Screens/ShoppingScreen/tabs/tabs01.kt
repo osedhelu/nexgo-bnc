@@ -9,24 +9,27 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.disglobal.bnc.R
 import com.disglobal.bnc.ui.Screens.ShoppingScreen.PagoHelper
-import com.disglobal.bnc.ui.components.NumericKeyboard
+import com.disglobal.bnc.ui.Screens.ShoppingScreen.providers.PaymentProvider
+import com.disglobal.bnc.ui.components.CustomKeyboard
 import com.disglobal.bnc.utils.FormatePriceUtilString
 
 @Composable
-fun PagoTab01(navController: NavController) {
+fun PagoTab01(
+    navController: NavController,
+) {
     val form by remember {
         PagoHelper.form
     }
-
-
     Column(
         Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -37,13 +40,18 @@ fun PagoTab01(navController: NavController) {
             Spacer(modifier = Modifier.size(8.dp))
             Text(text = FormatePriceUtilString(form.amount.value), fontSize = 20.sp)
         }
+        CustomKeyboard(num = form.amount, onClick = {
 
-        NumericKeyboard(
-            onNum = form.amount,
-            onEnter = {
-                navController.navigate("compras/2")
-            },
-            onBack = { navController.popBackStack() }
-        )
+            navController.navigate("compras/2")
+
+        })
+
+//        NumericKeyboard(
+//            onNum = form.amount,
+//            onEnter = {
+//            },
+//            onBack = { navController.popBackStack() }
+//        )
+
     }
 }

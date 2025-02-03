@@ -2,6 +2,7 @@ package com.disglobal.bnc.data.remote.dto
 
 import android.util.Log
 import com.disglobal.bnc.utils.jsonStringify
+import com.google.gson.JsonIOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -23,6 +24,9 @@ suspend fun <T> makeNetworkCall(
         } else {
             ApiResponseStatus.Error(response)
         }
+    } catch (e: JsonIOException) {
+
+        ApiResponseStatus.Error(e.message ?: "Error")
     } catch (e: Exception) {
         ApiResponseStatus.Error(e.message ?: "Error")
     }

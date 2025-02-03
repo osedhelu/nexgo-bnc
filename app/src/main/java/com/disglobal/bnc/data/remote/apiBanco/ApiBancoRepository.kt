@@ -6,10 +6,13 @@ import com.disglobal.bnc.data.remote.dto.ApiResponseStatus
 import com.disglobal.bnc.data.remote.dto.EchoTestDto
 import com.disglobal.bnc.data.remote.dto.EchoTestDtoResp
 import com.disglobal.bnc.data.remote.dto.GetInfoAffiliatesResp
+import com.disglobal.bnc.data.remote.dto.LotSummaryResponse
 import com.disglobal.bnc.data.remote.dto.ReceiverStatusDTO
 import com.disglobal.bnc.data.remote.dto.TransacionDtoResp
 import com.disglobal.bnc.data.remote.dto.makeNetworkCall
 import com.disglobal.bnc.utils.jsonStringify
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 
 
@@ -20,7 +23,7 @@ interface ApiBancoRepository {
         serial: String,
     ): ApiResponseStatus<GetInfoAffiliatesResp>
 
-    suspend fun getBatchSummary(affiliationId: String): ApiResponseStatus<String>
+    suspend fun getBatchSummary(affiliationId: String): ApiResponseStatus<LotSummaryResponse>
     suspend fun getInfoEchoTest(body: EchoTestDto): ApiResponseStatus<EchoTestDtoResp>
     suspend fun getTransactions(
         merchant: String,
@@ -60,7 +63,7 @@ class ApiBancoRepositoryImp @Inject constructor(
         MiApiDataSource.getInfoAffiliation(taxId, serial, "com.transactions.demo", "0.0.1-DEBUG")
     }
 
-    override suspend fun getBatchSummary(affiliationId: String): ApiResponseStatus<String> =
+    override suspend fun getBatchSummary(affiliationId: String): ApiResponseStatus<LotSummaryResponse> =
         makeNetworkCall {
             MiApiDataSource.getBatchSummary(affiliationId)
         }
@@ -101,6 +104,9 @@ class ApiBancoRepositoryImp @Inject constructor(
 
     override suspend fun registerTransaction(body: String): ApiResponseStatus<String> =
         makeNetworkCall {
-            MiApiDataSource.registerTransaction(body)
+            val mediaType = "text/plain".toMediaType()
+            val requestBody = body.toRequestBody(mediaType)
+            val resp = MiApiDataSource.registerTransaction(requestBody)
+            resp.string()
         }
 }

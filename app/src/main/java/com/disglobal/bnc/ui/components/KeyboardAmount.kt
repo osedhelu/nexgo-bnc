@@ -40,7 +40,7 @@ fun CustomButton(
 }
 
 @Composable
-fun NumericKeyboard(
+fun NumericKeyboards(
     onNum: MutableState<String>, onEnter: (String) -> Unit, onBack: () -> Unit = {},
 
     ) {
@@ -188,5 +188,5 @@ fun PreviewNumericKeyboard() {
     val num = remember { mutableStateOf("123") }
     val onNum by remember { num }
     Text(text = onNum)
-    NumericKeyboard(num, onEnter = { println(it) }, onBack = { println("back") })
+    NumericKeyboards(num, onEnter = { println(it) }, onBack = { println("back") })
 }
