@@ -13,9 +13,9 @@ import com.disglobal.bnc.ui.Screens.MainScreen.MainScreen
 import com.disglobal.bnc.ui.Screens.MainScreen.ReportScreen
 import com.disglobal.bnc.ui.Screens.ProfileScreen.ProfileScreen
 import com.disglobal.bnc.ui.Screens.ReportScreen.widget.ReportLayout
+import com.disglobal.bnc.ui.Screens.ShoppingScreen.EmvScreen
 import com.disglobal.bnc.ui.Screens.ShoppingScreen.PagoScreen
 import com.disglobal.bnc.ui.Screens.TestConnectionScreen.TestConnectionScreen
-import com.disglobal.bnc.utils.ConvertToBase64
 
 @Composable
 fun MainNavigation() {
@@ -24,11 +24,14 @@ fun MainNavigation() {
     val commerce = GetInfoAffiliatesResp.getCommerce(ctx)
     if (commerce !== null) {
 //        val token = ConvertToBase64("${commerceId.commerceCode}${commerce.terminalCode}")
-//        CommerceLocalData.setTokenAuth(ctx, token)
+//        CommerceLocalData.setTokenAuth(ctx, token)    EmvCardReader(this).startEmvCardDetection()
+
+//
         NavHost(navController = navController, startDestination = "main") {
             composable("main") {
                 MainLayout(navController = navController, logoCenter = true) {
-                    MainScreen(navController)
+//                    MainScreen(navController)
+                    EmvScreen()
                 }
             }
             composable("profile") {
