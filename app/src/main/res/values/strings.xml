@@ -44,7 +44,7 @@
     <string name="documento">Documento</string>
     <string name="datos_cliente">Datos Cliente</string>
     <string name="confirmar_operacion">Confirmar Operación</string>
-      <string name="recibo_operacion">Recibo Operación</string>
+    <string name="recibo_operacion">Recibo Operación</string>
     <string name="datos_pago_movil">Datos Pago Movil</string>
     <string name="text_valid_transacion">Por favor verifique que la informacion sea la correcta</string>
     <string name="comprobaciones">Comprobaciones</string>
@@ -62,4 +62,5 @@
     <string name="statuscode">Estado</string>
     <string name="anular_pago">Anular Pago</string>
     <string name="mensaje_compras">Ingrese Monto (0.01 - 9,999,999,999.99)</string>
+    <string name="title_activity_emv">EmvActivity</string>
 </resources>

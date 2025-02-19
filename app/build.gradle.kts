@@ -3,6 +3,7 @@ import com.android.build.gradle.api.ApplicationVariant
 import java.util.Properties
 import java.text.SimpleDateFormat
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
+import com.android.ide.common.repository.main
 import java.util.Date
 import java.io.File
 
@@ -76,6 +77,11 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
     }
+    sourceSets {
+        getByName("main") {
+            assets.srcDirs("src/main/assets")
+        }
+    }
 
     packagingOptions {
         resources {
@@ -85,17 +91,19 @@ android {
 }
 
 dependencies {
-    implementation("androidx.appcompat:appcompat:1.7.0-alpha01") // Actualizar a una versión compatible
     implementation("androidx.core:core-ktx:1.13.0-alpha01") // Actualizar a una versión compatible
-    implementation("androidx.appcompat:appcompat:1.6.1") // Última estable
     implementation("androidx.constraintlayout:constraintlayout:2.1.4") // Última estable
     implementation("androidx.recyclerview:recyclerview:1.3.1")
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui.graphics)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar"))))
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar", "*.jar"))))
     implementation(files("libs/nexgo-smartpos-sdk-v3.08.002_20240410.aar"))
-//    implementation(libs.socketio)
+    implementation(files("libs/iso8583_V1.0.jar"))
+    implementation(files("libs/spdh_V1.6.jar"))
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.runtime)
     implementation(libs.runtime.rxjava2)
