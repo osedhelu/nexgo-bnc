@@ -1,4 +1,4 @@
-package com.osedhelu.apiv3demo
+package com.disglobal.bnc.ui.test
 
 import android.content.Context
 import android.util.Log
@@ -54,6 +54,7 @@ class EmvUtils(var context: Context) {
             }
 
 
+        @OptIn(ExperimentalStdlibApi::class)
         val aidList: List<AidEntity>?
             get() {
                 val aidEntityList: MutableList<AidEntity> = ArrayList()

@@ -18,11 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.nexgobnc"
         tools:targetApi="31">
-        <activity
-            android:name=".ui.EmvActivity"
-            android:exported="false"
-            android:label="@string/title_activity_emv"
-            android:theme="@style/Theme.nexgobnc" />
+
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
