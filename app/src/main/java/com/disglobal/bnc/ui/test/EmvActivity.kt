@@ -73,7 +73,7 @@ class EmvActivity : ComponentActivity(), OnCardInfoListener, OnEmvProcessListene
         emvHandler2!!.emvDebugLog(true)
         LogUtils.setDebugEnable(true)
 
-        emvUtils = EmvUtils.build(this@EmvActivity)
+        emvUtils = EmvUtils.build(this@EmvActivity2)
     }
 
 
@@ -124,7 +124,7 @@ class EmvActivity : ComponentActivity(), OnCardInfoListener, OnEmvProcessListene
             }
 
             R.id.checkaiddetail -> {
-                Toast.makeText(this@EmvActivity, "Please check Logcat", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@EmvActivity2, "Please check Logcat", Toast.LENGTH_SHORT).show()
                 val aidEntities = emvHandler2!!.aidList
                 if (aidEntities == null) {
                     Log.d("nexgo", "AID = null")
@@ -152,7 +152,7 @@ class EmvActivity : ComponentActivity(), OnCardInfoListener, OnEmvProcessListene
         slotTypes.add(CardSlotTypeEnum.ICC1)
         slotTypes.add(CardSlotTypeEnum.RF)
         cardReader.searchCard(slotTypes, 60, this)
-        Toast.makeText(this@EmvActivity, "please insert or tap card", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this@EmvActivity2, "please insert or tap card", Toast.LENGTH_SHORT).show()
     }
 
     var amount: String? = null
@@ -241,7 +241,7 @@ class EmvActivity : ComponentActivity(), OnCardInfoListener, OnEmvProcessListene
         } else {
             runOnUiThread {
                 Toast.makeText(
-                    this@EmvActivity,
+                    this@EmvActivity2,
                     "search card failed",
                     Toast.LENGTH_SHORT
                 ).show()
@@ -348,7 +348,7 @@ class EmvActivity : ComponentActivity(), OnCardInfoListener, OnEmvProcessListene
     override fun onSwipeIncorrect() {
         runOnUiThread {
             Toast.makeText(
-                this@EmvActivity,
+                this@EmvActivity2,
                 "please search card again",
                 Toast.LENGTH_SHORT
             ).show()
@@ -359,7 +359,7 @@ class EmvActivity : ComponentActivity(), OnCardInfoListener, OnEmvProcessListene
         //cardReader.stopSearch(); //before next search card, please stopSearch first
 
         runOnUiThread {
-            Toast.makeText(this@EmvActivity, "please tap one card", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@EmvActivity2, "please tap one card", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -696,7 +696,7 @@ class EmvActivity : ComponentActivity(), OnCardInfoListener, OnEmvProcessListene
 
         runOnUiThread {
             Toast.makeText(
-                this@EmvActivity,
+                this@EmvActivity2,
                 retCode.toString() + "",
                 Toast.LENGTH_SHORT
             ).show()
@@ -736,7 +736,7 @@ class EmvActivity : ComponentActivity(), OnCardInfoListener, OnEmvProcessListene
                     retCode == SdkResult.PinPad_No_Pin_Input
                 )
             } else {
-                Toast.makeText(this@EmvActivity, "pin enter failed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@EmvActivity2, "pin enter failed", Toast.LENGTH_SHORT).show()
                 emvHandler2!!.onSetPinInputResponse(false, false)
             }
         }
