@@ -13,17 +13,14 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStream
 
-/**
- * cn.nexgo.inbas.components.emv
- * Author: zhaojiangon 2018/1/31 17:31.
- * Modified by Brad2018/4/23 : add test file
- */
-class EmvUtils(var context: Context) {
+
+class EmvUtils {
     companion object {
-        private lateinit var ctx: Context
+        lateinit var ctx: Context
+
         fun build(context: Context): EmvUtils {
             ctx = context
-            return EmvUtils(context)
+            return EmvUtils()
         }
 
         val capkList: List<CapkEntity>?
