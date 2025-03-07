@@ -12,9 +12,11 @@ import org.w3c.dom.Element
 import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStream
+import javax.inject.Inject
+import javax.inject.Singleton
 
-
-class EmvUtils {
+@Singleton
+class EmvUtils @Inject constructor() {
     companion object {
         lateinit var ctx: Context
 

@@ -50,7 +50,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.disglobal.bnc.ui.theme.MyApplicationTheme
 import com.nexgo.oaf.apiv3.SdkResult
 import com.nexgo.oaf.apiv3.emv.CandidateAppInfoEntity
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class EmvActivity : ComponentActivity(), EmvViewModel.PinInputListener,
     EmvViewModel.CardSelectionListener, EmvViewModel.EmvProcessListener {
 
@@ -59,8 +61,8 @@ class EmvActivity : ComponentActivity(), EmvViewModel.PinInputListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Inicializar ViewModel
-        viewModel = ViewModelProvider(this)[EmvViewModel::class.java]
+        // Inicializar ViewModel usando Hilt
+        viewModel = ViewModelProvider(this).get(EmvViewModel::class.java)
 
         // Configurar listeners
         viewModel.setPinInputListener(this)
@@ -152,7 +154,7 @@ fun EmvScreen(viewModel: EmvViewModel) {
 
     var showAmountDialog by remember { mutableStateOf(false) }
     var amountInput by remember { mutableStateOf("") }
-    
+
     // Nuevo estado para mostrar el diálogo de procesamiento en línea
     var showProcessingDialog by remember { mutableStateOf(false) }
 
@@ -174,11 +176,11 @@ fun EmvScreen(viewModel: EmvViewModel) {
                     (transactionState as EmvViewModel.TransactionState.ConfirmCardNumber).cardNumber
                 showCardConfirmDialog = true
             }
-            
+
             is EmvViewModel.TransactionState.ProcessingOnline -> {
                 showProcessingDialog = true
             }
-            
+
             is EmvViewModel.TransactionState.Completed,
             is EmvViewModel.TransactionState.Error -> {
                 showProcessingDialog = false
@@ -472,7 +474,7 @@ fun EmvScreen(viewModel: EmvViewModel) {
             }
         }
     }
-    
+
     // Diálogo de procesamiento en línea
     if (showProcessingDialog) {
         Dialog(onDismissRequest = { /* No permitir cerrar al tocar fuera */ }) {
@@ -491,22 +493,22 @@ fun EmvScreen(viewModel: EmvViewModel) {
                         text = "Procesando Pago",
                         style = MaterialTheme.typography.titleLarge
                     )
-                    
+
                     Spacer(modifier = Modifier.height(16.dp))
-                    
+
                     CircularProgressIndicator(
                         modifier = Modifier.size(50.dp)
                     )
-                    
+
                     Spacer(modifier = Modifier.height(16.dp))
-                    
+
                     Text(
                         text = "Conectando con el servidor...",
                         textAlign = TextAlign.Center
                     )
-                    
+
                     Spacer(modifier = Modifier.height(8.dp))
-                    
+
                     Text(
                         text = "Por favor espere mientras procesamos su transacción",
                         textAlign = TextAlign.Center,

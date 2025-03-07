@@ -1,13 +1,12 @@
 package com.disglobal.bnc.ui.test
 
 import android.app.Application
-import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.disglobal.bnc.features.common.emv.EmvRepository
 import com.disglobal.bnc.nexgobnc
 import com.google.gson.Gson
 import com.nexgo.common.ByteUtils
@@ -21,9 +20,7 @@ import com.nexgo.oaf.apiv3.device.pinpad.PinPadKeyCode
 import com.nexgo.oaf.apiv3.device.reader.CardInfoEntity
 import com.nexgo.oaf.apiv3.device.reader.CardSlotTypeEnum
 import com.nexgo.oaf.apiv3.device.reader.OnCardInfoListener
-import com.nexgo.oaf.apiv3.emv.AmexTransDataEntity
 import com.nexgo.oaf.apiv3.emv.CandidateAppInfoEntity
-import com.nexgo.oaf.apiv3.emv.DynamicReaderLimitEntity
 import com.nexgo.oaf.apiv3.emv.EmvDataSourceEnum
 import com.nexgo.oaf.apiv3.emv.EmvEntryModeEnum
 import com.nexgo.oaf.apiv3.emv.EmvHandler2
@@ -34,14 +31,20 @@ import com.nexgo.oaf.apiv3.emv.EmvTransConfigurationEntity
 import com.nexgo.oaf.apiv3.emv.OnEmvProcessListener2
 import com.nexgo.oaf.apiv3.emv.PromptEnum
 import com.nexgo.oaf.apiv3.emv.UnionPayTransDataEntity
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import javax.inject.Inject
 
-class EmvViewModel(application: Application) : AndroidViewModel(application), OnCardInfoListener,
+@HiltViewModel
+class EmvViewModel @Inject constructor(
+    application: Application,
+    private val emvRepository: EmvRepository,
+) : AndroidViewModel(application), OnCardInfoListener,
     OnEmvProcessListener2, OnPinPadInputListener {
     private val _passwordPIN = MutableLiveData("")
     fun passwordPIN(): LiveData<String> = _passwordPIN
@@ -168,48 +171,15 @@ class EmvViewModel(application: Application) : AndroidViewModel(application), On
     // Métodos públicos para interactuar con el ViewModel
 
     fun initEmvAid(): Boolean {
-        emvHandler2?.delAllAid()
-        if (emvHandler2?.aidListNum ?: 0 <= 0) {
-            val aidEntityList = EmvUtils.aidList
-            if (aidEntityList == null) {
-                Log.d("nexgo", "initAID failed")
-                return false
-            }
-
-            val result = emvHandler2?.setAidParaList(aidEntityList) ?: -1
-            Log.d("nexgo", "setAidParaList $result")
-            return result > 0
-        } else {
-            Log.d("nexgo", "setAidParaList already load aid")
-            return true
-        }
+        return emvRepository.initEmvAid()
     }
 
     fun initEmvCapk(): Boolean {
-        emvHandler2?.delAllCapk()
-        val capk_num = emvHandler2?.capkListNum ?: 0
-        Log.d("nexgo", "capk_num $capk_num")
-        if (capk_num <= 0) {
-            val capkEntityList = EmvUtils.capkList
-            if (capkEntityList == null) {
-                Log.d("nexgo", "initCAPK failed")
-                return false
-            }
-            val result = emvHandler2?.setCAPKList(capkEntityList) ?: -1
-            Log.d("nexgo", "setCAPKList $result")
-            return result > 0
-        } else {
-            Log.d("nexgo", "setCAPKList already load capk")
-            return true
-        }
+        return emvRepository.initEmvCapk()
     }
 
     fun checkAid(): Pair<Int, Int> {
-        val aidNum = emvHandler2?.aidListNum ?: 0
-        val capkNum = emvHandler2?.capkListNum ?: 0
-        Log.d("nexgo", "getAidListNum $aidNum")
-        Log.d("nexgo", "getCapkListNum $capkNum")
-        return Pair(aidNum, capkNum)
+        return emvRepository.checkAid()
     }
 
     fun checkAidDetail() {
@@ -397,7 +367,7 @@ class EmvViewModel(application: Application) : AndroidViewModel(application), On
 
     override fun onOnlineProc() {
         Log.d("nexgo", "onOnlineProc")
-        
+
         // Actualizar el estado para mostrar el diálogo de procesamiento
         _transactionState.postValue(TransactionState.ProcessingOnline)
 
@@ -418,17 +388,40 @@ class EmvViewModel(application: Application) : AndroidViewModel(application), On
         Log.d("nexgo", "AID (84)--" + (tlv_84?.let { ByteUtils.byteArray2HexString(it) } ?: "null"))
 
         val tlv_50 = emvHandler2?.getTlv(byteArrayOf(0x50.toByte()), EmvDataSourceEnum.FROM_KERNEL)
-        Log.d("nexgo", "Application Label (50)--" + (tlv_50?.let { ByteUtils.byteArray2HexString(it) } ?: "null"))
-        
-        val tlv_9F26 = emvHandler2?.getTlv(byteArrayOf(0x9F.toByte(), 0x26.toByte()), EmvDataSourceEnum.FROM_KERNEL)
-        Log.d("nexgo", "Application Cryptogram (9F26)--" + (tlv_9F26?.let { ByteUtils.byteArray2HexString(it) } ?: "null"))
-        
-        val tlv_9F27 = emvHandler2?.getTlv(byteArrayOf(0x9F.toByte(), 0x27.toByte()), EmvDataSourceEnum.FROM_KERNEL)
-        Log.d("nexgo", "Cryptogram Information Data (9F27)--" + (tlv_9F27?.let { ByteUtils.byteArray2HexString(it) } ?: "null"))
-        
-        val tlv_9F36 = emvHandler2?.getTlv(byteArrayOf(0x9F.toByte(), 0x36.toByte()), EmvDataSourceEnum.FROM_KERNEL)
-        Log.d("nexgo", "Application Transaction Counter (9F36)--" + (tlv_9F36?.let { ByteUtils.byteArray2HexString(it) } ?: "null"))
-        
+        Log.d(
+            "nexgo",
+            "Application Label (50)--" + (tlv_50?.let { ByteUtils.byteArray2HexString(it) }
+                ?: "null"))
+
+        val tlv_9F26 = emvHandler2?.getTlv(
+            byteArrayOf(0x9F.toByte(), 0x26.toByte()),
+            EmvDataSourceEnum.FROM_KERNEL
+        )
+        Log.d(
+            "nexgo",
+            "Application Cryptogram (9F26)--" + (tlv_9F26?.let { ByteUtils.byteArray2HexString(it) }
+                ?: "null"))
+
+        val tlv_9F27 = emvHandler2?.getTlv(
+            byteArrayOf(0x9F.toByte(), 0x27.toByte()),
+            EmvDataSourceEnum.FROM_KERNEL
+        )
+        Log.d(
+            "nexgo",
+            "Cryptogram Information Data (9F27)--" + (tlv_9F27?.let {
+                ByteUtils.byteArray2HexString(it)
+            } ?: "null"))
+
+        val tlv_9F36 = emvHandler2?.getTlv(
+            byteArrayOf(0x9F.toByte(), 0x36.toByte()),
+            EmvDataSourceEnum.FROM_KERNEL
+        )
+        Log.d(
+            "nexgo",
+            "Application Transaction Counter (9F36)--" + (tlv_9F36?.let {
+                ByteUtils.byteArray2HexString(it)
+            } ?: "null"))
+
         // TODO: Aquí debes implementar la llamada a tu API para procesar la compra
         // Ejemplo de cómo construir un mapa con los datos TLV para enviar al servidor
         val tlvMap = HashMap<String, String>()
@@ -439,28 +432,29 @@ class EmvViewModel(application: Application) : AndroidViewModel(application), On
         tlv_9F26?.let { tlvMap["9F26"] = ByteUtils.byteArray2HexString(it) }
         tlv_9F27?.let { tlvMap["9F27"] = ByteUtils.byteArray2HexString(it) }
         tlv_9F36?.let { tlvMap["9F36"] = ByteUtils.byteArray2HexString(it) }
-        
+
         // También puedes obtener el campo 55 completo para enviar al servidor
         // Este campo contiene todos los TLVs necesarios para la autorización
         val field55 = buildField55()
         Log.d("nexgo", "Field 55: $field55")
-        
+
         // Llamada a la API (simulada)
         processPaymentWithApi(tlvMap, field55)
-        
+
         // Para este ejemplo, simulamos una respuesta exitosa del servidor
         val emvOnlineResult = EmvOnlineResultEntity()
         emvOnlineResult.authCode = "123450"  // Código de autorización del servidor
         emvOnlineResult.rejCode = "00"       // Código de respuesta (00 = aprobado)
-        
+
         // Si el servidor devuelve datos EMV en formato TLV (campo 55 de respuesta)
         // debes asignarlos aquí para el segundo proceso de autenticación
-        emvOnlineResult.recvField55 = null   // Ejemplo: ByteUtils.hexString2ByteArray("910870741219600860008a023030")
-        
+        emvOnlineResult.recvField55 =
+            null   // Ejemplo: ByteUtils.hexString2ByteArray("910870741219600860008a023030")
+
         // Informar al SDK el resultado de la transacción en línea
         emvHandler2?.onSetOnlineProcResponse(SdkResult.Success, emvOnlineResult)
     }
-    
+
     /**
      * Construye el campo 55 (EMV Data) para enviar al servidor
      * Este campo contiene todos los TLVs necesarios para la autorización
@@ -476,16 +470,28 @@ class EmvViewModel(application: Application) : AndroidViewModel(application), On
             byteArrayOf(0x9C.toByte()),              // 9C - Tipo de transacción
             byteArrayOf(0x9F.toByte(), 0x02.toByte()),        // 9F02 - Monto
             byteArrayOf(0x9F.toByte(), 0x03.toByte()),        // 9F03 - Monto adicional
-            byteArrayOf(0x9F.toByte(), 0x10.toByte()),        // 9F10 - Datos de aplicación específicos del emisor
+            byteArrayOf(
+                0x9F.toByte(),
+                0x10.toByte()
+            ),        // 9F10 - Datos de aplicación específicos del emisor
             byteArrayOf(0x9F.toByte(), 0x1A.toByte()),        // 9F1A - Código de país del terminal
             byteArrayOf(0x9F.toByte(), 0x26.toByte()),        // 9F26 - Criptograma de aplicación
-            byteArrayOf(0x9F.toByte(), 0x27.toByte()),        // 9F27 - Datos de información del criptograma
-            byteArrayOf(0x9F.toByte(), 0x36.toByte()),        // 9F36 - Contador de transacciones de aplicación
-            byteArrayOf(0x9F.toByte(), 0x37.toByte())         // 9F37 - Número aleatorio no predecible
+            byteArrayOf(
+                0x9F.toByte(),
+                0x27.toByte()
+            ),        // 9F27 - Datos de información del criptograma
+            byteArrayOf(
+                0x9F.toByte(),
+                0x36.toByte()
+            ),        // 9F36 - Contador de transacciones de aplicación
+            byteArrayOf(
+                0x9F.toByte(),
+                0x37.toByte()
+            )         // 9F37 - Número aleatorio no predecible
         )
-        
+
         val field55Builder = StringBuilder()
-        
+
         for (tag in commonTags) {
             val value = emvHandler2?.getTlv(tag, EmvDataSourceEnum.FROM_KERNEL)
             if (value != null) {
@@ -495,10 +501,10 @@ class EmvViewModel(application: Application) : AndroidViewModel(application), On
                 field55Builder.append(tagStr).append(lenStr).append(valueStr)
             }
         }
-        
+
         return field55Builder.toString()
     }
-    
+
     /**
      * Procesa el pago con la API del servidor
      * @param tlvMap Mapa de TLVs para enviar al servidor
@@ -507,7 +513,7 @@ class EmvViewModel(application: Application) : AndroidViewModel(application), On
     private fun processPaymentWithApi(tlvMap: HashMap<String, String>, field55: String) {
         // TODO: Implementar la llamada real a tu API
         // Ejemplo de cómo podrías estructurar la llamada usando Retrofit o similar
-        
+
         viewModelScope.launch {
             try {
                 // Ejemplo de estructura de datos para enviar al servidor
@@ -516,12 +522,12 @@ class EmvViewModel(application: Application) : AndroidViewModel(application), On
                 requestData["cardNo"] = cardNo ?: ""
                 requestData["tlvData"] = tlvMap
                 requestData["field55"] = field55
-                
+
                 // Aquí iría la llamada real a tu API
                 // val response = apiService.processPayment(requestData)
-                
+
                 Log.d("nexgo", "API call would be made with data: ${Gson().toJson(requestData)}")
-                
+
                 // Procesar la respuesta
                 // if (response.isSuccessful) {
                 //    // Manejar respuesta exitosa
@@ -535,8 +541,8 @@ class EmvViewModel(application: Application) : AndroidViewModel(application), On
         }
     }
 
-    override fun onFinish(retCode: Int, entity: EmvProcessResultEntity) {
-        Log.d("nexgo", "onFinish retCode: $retCode")
+    override fun onFinish(retCode: Int, entity: EmvProcessResultEntity?) {
+        Log.d("nexgo", "onFinish retCode: $retCode, entity: ${entity != null}")
 
         // Verificar si es necesario volver a presentar la tarjeta (ExpressPay)
         var flag = false
@@ -590,12 +596,24 @@ class EmvViewModel(application: Application) : AndroidViewModel(application), On
     }
 
     override fun onSendKey(keyCode: Byte) {
-        if (keyCode == PinPadKeyCode.KEYCODE_CLEAR) {
-            pwdText = ""
-        } else {
-            pwdText += "* "
+        when (keyCode) {
+            PinPadKeyCode.KEYCODE_CLEAR -> {
+                pwdText = ""
+                _passwordPIN.postValue("")
+            }
+
+            PinPadKeyCode.KEYCODE_CANCEL -> {
+                // No hacer nada, se manejará en onInputResult
+            }
+
+            else -> {
+                pwdText = (pwdText ?: "") + "*"
+                _passwordPIN.postValue(pwdText)
+            }
         }
-//        pwdTv!!.text = pwdText
+
+        // Notificar al listener
+        pinInputListener?.onPinTextChanged(pwdText ?: "")
     }
 
 
