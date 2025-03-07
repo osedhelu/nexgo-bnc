@@ -1,7 +1,9 @@
 package com.disglobal.bnc.ui.test
 
 import android.app.Application
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -170,6 +172,7 @@ class EmvViewModel @Inject constructor(
 
     // Métodos públicos para interactuar con el ViewModel
 
+    @RequiresApi(Build.VERSION_CODES.N)
     fun initEmvAid(): Boolean {
         return emvRepository.initEmvAid()
     }

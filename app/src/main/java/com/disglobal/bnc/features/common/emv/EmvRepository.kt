@@ -74,29 +74,35 @@ class EmvRepository @Inject constructor(
                 try {
                     // Convertir el AID a ByteArray
                     val aidBytes = ByteUtils.hexString2ByteArray(aidEntity.aid)
-                    
+
                     // Determinar la marca de la tarjeta
                     val cardBrand = aidToBrandMap.getOrDefault(
-                        aidEntity.aid, 
+                        aidEntity.aid,
                         EmvCardBrandEnum.EMV_CARD_BRAND_VISA // Valor predeterminado
                     )
-                    
+
                     // Intentar eliminar el AID existente (si existe)
                     emvHandler2?.delOneAid(aidBytes)
-                    
+
                     // Intentar agregar el AID
                     val result = emvHandler2?.contactlessAppendAidIntoKernel(
-                        cardBrand, 
-                        0x01.toByte(), 
+                        cardBrand,
+                        0x01.toByte(),
                         aidBytes
                     ) ?: -1
 
                     if (result > 0) {
                         successCount++
-                        Log.d("nexgo", "AID agregado exitosamente: ${aidEntity.aid}, Marca: $cardBrand")
+                        Log.d(
+                            "nexgo",
+                            "AID agregado exitosamente: ${aidEntity.aid}, Marca: $cardBrand"
+                        )
                     } else {
                         failureCount++
-                        Log.e("nexgo", "Error al agregar AID: ${aidEntity.aid}, Código de error: $result")
+                        Log.e(
+                            "nexgo",
+                            "Error al agregar AID: ${aidEntity.aid}, Código de error: $result"
+                        )
                     }
                 } catch (e: Exception) {
                     failureCount++

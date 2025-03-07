@@ -1,10 +1,12 @@
 package com.disglobal.bnc.ui.test
 
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -52,6 +54,7 @@ import com.nexgo.oaf.apiv3.SdkResult
 import com.nexgo.oaf.apiv3.emv.CandidateAppInfoEntity
 import dagger.hilt.android.AndroidEntryPoint
 
+@RequiresApi(Build.VERSION_CODES.N)
 @AndroidEntryPoint
 class EmvActivity : ComponentActivity(), EmvViewModel.PinInputListener,
     EmvViewModel.CardSelectionListener, EmvViewModel.EmvProcessListener {
@@ -137,6 +140,7 @@ class EmvActivity : ComponentActivity(), EmvViewModel.PinInputListener,
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.N)
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun EmvScreen(viewModel: EmvViewModel) {
