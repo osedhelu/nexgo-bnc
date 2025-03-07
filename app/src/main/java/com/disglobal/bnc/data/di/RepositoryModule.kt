@@ -1,7 +1,7 @@
 package com.disglobal.bnc.data.di
 
-import com.disglobal.bnc.data.remote.apiBanco.ApiBancoRepository
-import com.disglobal.bnc.data.remote.apiBanco.ApiBancoRepositoryImp
+import com.disglobal.bnc.DigipayApi.domain.repositories.DigipayRepository
+import com.disglobal.bnc.DigipayApi.infrastructure.repositories.DigipayRepositoryImp
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -14,7 +14,7 @@ import javax.inject.Singleton
 abstract class RepositoryModule {
     @Singleton
     @Binds
-    abstract fun BancoRepository(repo: ApiBancoRepositoryImp): ApiBancoRepository
+    abstract fun BancoRepository(repo: DigipayRepositoryImp): DigipayRepository
 
 }
 

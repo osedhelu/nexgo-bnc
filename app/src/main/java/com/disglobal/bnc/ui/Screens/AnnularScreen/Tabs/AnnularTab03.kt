@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.disglobal.bnc.R
-import com.disglobal.bnc.data.remote.dto.GetInfoAffiliatesResp
+import com.disglobal.bnc.DigipayApi.domain.entities.GetInfoAffiliatesResp
 import com.disglobal.bnc.ui.Screens.AnnularScreen.AnnulmentHelpers
 import com.disglobal.bnc.ui.components.ButtonPersonal
 import com.disglobal.bnc.ui.components.RowItems

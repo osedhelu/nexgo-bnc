@@ -3,8 +3,8 @@ package com.disglobal.bnc.ui.Screens.AnnularScreen
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.disglobal.bnc.data.remote.dto.AnnulmentDto
-import com.disglobal.bnc.data.remote.dto.AnnulmentRespDto
+import com.disglobal.bnc.DigipayApi.domain.entities.AnnulmentDto
+import com.disglobal.bnc.DigipayApi.domain.entities.AnnulmentRespDto
 
 
 object AnnulmentHelpers : ViewModel() {

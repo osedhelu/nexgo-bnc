@@ -21,7 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.disglobal.bnc.R
-import com.disglobal.bnc.data.remote.dto.GetInfoAffiliatesResp
+import com.disglobal.bnc.DigipayApi.domain.entities.GetInfoAffiliatesResp
 import com.disglobal.bnc.utils.GoToActivity
 import com.disglobal.bnc.utils.iNameActivity
 

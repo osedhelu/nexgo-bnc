@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.disglobal.bnc.R
 import com.disglobal.bnc.data.remote.dto.ApiResponseStatus
-import com.disglobal.bnc.data.remote.dto.GetInfoAffiliatesResp
+import com.disglobal.bnc.DigipayApi.domain.entities.GetInfoAffiliatesResp
 import com.disglobal.bnc.ui.Layouts.LoginLayout
 import com.disglobal.bnc.ui.components.ButtonPersonal
 import com.disglobal.bnc.ui.components.InputGlobal

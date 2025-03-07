@@ -1,4 +1,4 @@
-package com.disglobal.bnc.data.remote.dto
+package com.disglobal.bnc.DigipayApi.domain.entities
 
 import android.content.Context
 import com.google.gson.annotations.SerializedName

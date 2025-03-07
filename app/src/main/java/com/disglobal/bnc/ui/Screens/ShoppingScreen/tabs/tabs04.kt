@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,8 +29,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.disglobal.bnc.R
 import com.disglobal.bnc.config.FontSize
-import com.disglobal.bnc.data.remote.dto.AnnulmentDto
-import com.disglobal.bnc.data.remote.dto.GetInfoAffiliatesResp
+import com.disglobal.bnc.DigipayApi.domain.entities.AnnulmentDto
+import com.disglobal.bnc.DigipayApi.domain.entities.GetInfoAffiliatesResp
 import com.disglobal.bnc.ui.Screens.AnnularScreen.AnnulmentHelpers
 import com.disglobal.bnc.ui.Screens.ShoppingScreen.PagoHelper
 import com.disglobal.bnc.ui.components.ButtonPersonal

@@ -474,14 +474,14 @@ class EmvViewModel(application: Application) : AndroidViewModel(application), On
             byteArrayOf(0x95.toByte()),              // 95 - TVR
             byteArrayOf(0x9A.toByte()),              // 9A - Fecha de transacción
             byteArrayOf(0x9C.toByte()),              // 9C - Tipo de transacción
-            byteArrayOf(0x9F, 0x02.toByte()),        // 9F02 - Monto
-            byteArrayOf(0x9F, 0x03.toByte()),        // 9F03 - Monto adicional
-            byteArrayOf(0x9F, 0x10.toByte()),        // 9F10 - Datos de aplicación específicos del emisor
-            byteArrayOf(0x9F, 0x1A.toByte()),        // 9F1A - Código de país del terminal
-            byteArrayOf(0x9F, 0x26.toByte()),        // 9F26 - Criptograma de aplicación
-            byteArrayOf(0x9F, 0x27.toByte()),        // 9F27 - Datos de información del criptograma
-            byteArrayOf(0x9F, 0x36.toByte()),        // 9F36 - Contador de transacciones de aplicación
-            byteArrayOf(0x9F, 0x37.toByte())         // 9F37 - Número aleatorio no predecible
+            byteArrayOf(0x9F.toByte(), 0x02.toByte()),        // 9F02 - Monto
+            byteArrayOf(0x9F.toByte(), 0x03.toByte()),        // 9F03 - Monto adicional
+            byteArrayOf(0x9F.toByte(), 0x10.toByte()),        // 9F10 - Datos de aplicación específicos del emisor
+            byteArrayOf(0x9F.toByte(), 0x1A.toByte()),        // 9F1A - Código de país del terminal
+            byteArrayOf(0x9F.toByte(), 0x26.toByte()),        // 9F26 - Criptograma de aplicación
+            byteArrayOf(0x9F.toByte(), 0x27.toByte()),        // 9F27 - Datos de información del criptograma
+            byteArrayOf(0x9F.toByte(), 0x36.toByte()),        // 9F36 - Contador de transacciones de aplicación
+            byteArrayOf(0x9F.toByte(), 0x37.toByte())         // 9F37 - Número aleatorio no predecible
         )
         
         val field55Builder = StringBuilder()

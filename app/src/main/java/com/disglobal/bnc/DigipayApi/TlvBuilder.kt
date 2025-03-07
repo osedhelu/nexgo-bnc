@@ -1,4 +1,4 @@
-package com.disglobal.bnc.api
+package com.disglobal.bnc.DigipayApi
 
 import com.nexgo.common.ByteUtils
 import com.nexgo.oaf.apiv3.emv.EmvDataSourceEnum

@@ -5,9 +5,9 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.disglobal.bnc.data.remote.apiBanco.ApiBancoRepositoryImp
 import com.disglobal.bnc.data.remote.dto.ApiResponseStatus
-import com.disglobal.bnc.data.remote.dto.GetInfoAffiliatesResp
+import com.disglobal.bnc.DigipayApi.domain.entities.GetInfoAffiliatesResp
+import com.disglobal.bnc.DigipayApi.domain.repositories.DigipayRepository
 import com.disglobal.bnc.ui.components.Loading.IconType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val repositoryApi: ApiBancoRepositoryImp,
+    private val repositoryApi: DigipayRepository,
 ) : ViewModel() {
     val status: MutableState<ApiResponseStatus<GetInfoAffiliatesResp>> =
         mutableStateOf(ApiResponseStatus.Success(GetInfoAffiliatesResp()))

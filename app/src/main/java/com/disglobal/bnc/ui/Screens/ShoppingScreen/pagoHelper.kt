@@ -4,7 +4,7 @@ package com.disglobal.bnc.ui.Screens.ShoppingScreen
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.disglobal.bnc.data.remote.dto.PaymentRespDto
+import com.disglobal.bnc.DigipayApi.domain.entities.PaymentRespDto
 import com.disglobal.bnc.data.remote.dto.ResponseDto
 import com.disglobal.bnc.utils.convertirANumeroDecimal
 

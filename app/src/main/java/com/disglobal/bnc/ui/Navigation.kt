@@ -5,11 +5,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.disglobal.bnc.data.remote.dto.GetInfoAffiliatesResp
+import com.disglobal.bnc.DigipayApi.domain.entities.GetInfoAffiliatesResp
 import com.disglobal.bnc.ui.Layouts.MainLayout
 import com.disglobal.bnc.ui.Screens.AnnularScreen.AnnularScreen
 import com.disglobal.bnc.ui.Screens.LoginScreen.LoginScreen
-import com.disglobal.bnc.ui.Screens.MainScreen.MainScreen
 import com.disglobal.bnc.ui.Screens.MainScreen.ReportScreen
 import com.disglobal.bnc.ui.Screens.ProfileScreen.ProfileScreen
 import com.disglobal.bnc.ui.Screens.ReportScreen.widget.ReportLayout

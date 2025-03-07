@@ -5,7 +5,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.disglobal.bnc.data.remote.apiBanco.ApiBancoRepositoryImp
+import com.disglobal.bnc.DigipayApi.domain.repositories.DigipayRepository
 import com.disglobal.bnc.data.remote.dto.ApiResponseStatus
 import com.disglobal.bnc.ui.components.Loading.IconType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PaymentProvider @Inject constructor(
-    private val repositoryApi: ApiBancoRepositoryImp,
+    private val repositoryApi: DigipayRepository,
 ) : ViewModel() {
     val status: MutableState<ApiResponseStatus<String>> =
         mutableStateOf(ApiResponseStatus.Loading())
@@ -29,9 +29,9 @@ class PaymentProvider @Inject constructor(
         viewModelScope.launch {
             status.value = ApiResponseStatus.Loading()
             typeLottie.value = IconType.TEST
-            handleGetStatusResponse(
-                repositoryApi.registerTransaction(hash)
-            )
+//            handleGetStatusResponse(
+////                repositoryApi.registerTransaction(hash)
+//            )
         }
     }
 

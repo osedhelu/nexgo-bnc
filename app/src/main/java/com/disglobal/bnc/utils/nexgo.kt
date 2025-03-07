@@ -12,7 +12,7 @@ import com.disglobal.bnc.config.SERIAL_DEFAULT
 import com.disglobal.bnc.config.iValueCardTransacion
 import com.disglobal.bnc.data.local.database.TransCount
 import com.disglobal.bnc.data.local.database.TransactionTableDB
-import com.disglobal.bnc.data.remote.dto.GetInfoAffiliatesResp
+import com.disglobal.bnc.DigipayApi.domain.entities.GetInfoAffiliatesResp
 import com.disglobal.bnc.nexgobnc
 import com.nexgo.common.ByteUtils
 import com.nexgo.common.LogUtils

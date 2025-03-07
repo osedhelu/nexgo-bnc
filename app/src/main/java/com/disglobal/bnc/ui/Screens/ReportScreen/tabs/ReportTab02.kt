@@ -14,9 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.disglobal.bnc.data.local.database.Transaction
 import com.disglobal.bnc.data.remote.dto.ApiResponseStatus
-import com.disglobal.bnc.data.remote.dto.GetInfoAffiliatesResp
-import com.disglobal.bnc.data.remote.dto.LotSummaryResponse
+import com.disglobal.bnc.DigipayApi.domain.entities.GetInfoAffiliatesResp
+import com.disglobal.bnc.DigipayApi.domain.entities.LotSummaryResponse
 import com.disglobal.bnc.ui.Screens.ReportScreen.view_models.LotSummaryViewModel
 
 

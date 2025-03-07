@@ -2,11 +2,11 @@ package com.disglobal.bnc.data.di
 
 import android.content.Context
 import androidx.room.Room
+import com.disglobal.bnc.DigipayApi.domain.datasources.DigipayDatasource
 import com.google.gson.GsonBuilder
 import com.disglobal.bnc.config.BASEURL
 import com.disglobal.bnc.data.local.database.AppDatabase
 import com.disglobal.bnc.data.local.database.TransactionDao
-import com.disglobal.bnc.data.remote.BancoDataSource
 import com.disglobal.bnc.data.remote.createCustomOkHttpClient
 import dagger.Module
 import dagger.Provides
@@ -32,11 +32,11 @@ object DataSourceModule {
     fun providerRetrofit(
         @ApplicationContext context: Context,
         @Named("BACKEND_URL") baseUrl: String,
-    ): BancoDataSource {
+    ): DigipayDatasource {
         val gson = GsonBuilder().setLenient().create()
         return Retrofit.Builder().addConverterFactory(GsonConverterFactory.create(gson))
             .client(createCustomOkHttpClient(context)).baseUrl(baseUrl).build()
-            .create(BancoDataSource::class.java)
+            .create(DigipayDatasource::class.java)
 
     }
 
