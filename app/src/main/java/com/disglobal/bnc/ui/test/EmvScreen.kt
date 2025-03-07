@@ -1,51 +1,77 @@
 package com.disglobal.bnc.ui.test
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.nexgo.oaf.apiv3.emv.CandidateAppInfoEntity
+import com.disglobal.bnc.ui.theme.MyApplicationTheme
 
 @Composable
 fun EmvScreen(viewModel: EmvViewModel) {
-    val transactionState by viewModel.transactionState().observeAsState(EmvViewModel.TransactionState.Idle)
+    val transactionState by viewModel.transactionState()
+        .observeAsState(EmvViewModel.TransactionState.Idle)
     val pinText by viewModel.passwordPIN().observeAsState("")
-    
+
     var amount by remember { mutableStateOf("1.00") }
     var showAppSelectionDialog by remember { mutableStateOf(false) }
     var showCardConfirmationDialog by remember { mutableStateOf(false) }
     var showPinDialog by remember { mutableStateOf(false) }
     var appNames by remember { mutableStateOf(listOf<String>()) }
     var cardNumber by remember { mutableStateOf("") }
-    
+
     // Observar cambios en el estado de la transacción
     LaunchedEffect(transactionState) {
         when (transactionState) {
             is EmvViewModel.TransactionState.SelectApplication -> {
-                appNames = (transactionState as EmvViewModel.TransactionState.SelectApplication).appNames
+                appNames =
+                    (transactionState as EmvViewModel.TransactionState.SelectApplication).appNames
                 showAppSelectionDialog = true
             }
+
             is EmvViewModel.TransactionState.ConfirmCardNumber -> {
-                cardNumber = (transactionState as EmvViewModel.TransactionState.ConfirmCardNumber).cardNumber
+                cardNumber =
+                    (transactionState as EmvViewModel.TransactionState.ConfirmCardNumber).cardNumber
                 showCardConfirmationDialog = true
             }
+
             is EmvViewModel.TransactionState.PinRequested -> {
                 showPinDialog = true
             }
+
             is EmvViewModel.TransactionState.Completed -> {
                 showAppSelectionDialog = false
                 showCardConfirmationDialog = false
                 showPinDialog = false
             }
+
             else -> {}
         }
     }
-    
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -57,9 +83,9 @@ fun EmvScreen(viewModel: EmvViewModel) {
             text = "Procesamiento EMV",
             style = MaterialTheme.typography.headlineMedium
         )
-        
+
         Spacer(modifier = Modifier.height(16.dp))
-        
+
         OutlinedTextField(
             value = amount,
             onValueChange = { amount = it },
@@ -67,18 +93,18 @@ fun EmvScreen(viewModel: EmvViewModel) {
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         Spacer(modifier = Modifier.height(16.dp))
-        
+
         Button(
             onClick = { viewModel.startEmvProcess(amount.replace(".", "")) },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Iniciar Transacción")
         }
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         Button(
             onClick = { viewModel.cancelEmvProcess() },
             modifier = Modifier.fillMaxWidth(),
@@ -86,36 +112,43 @@ fun EmvScreen(viewModel: EmvViewModel) {
         ) {
             Text("Cancelar")
         }
-        
+
         // Estado actual de la transacción
         when (transactionState) {
             is EmvViewModel.TransactionState.Idle -> {
                 Text("Listo para iniciar transacción")
             }
+
             is EmvViewModel.TransactionState.CardReading -> {
                 CircularProgressIndicator()
                 Text("Esperando tarjeta...")
             }
+
             is EmvViewModel.TransactionState.ProcessingEmv -> {
                 CircularProgressIndicator()
                 Text("Procesando EMV...")
             }
+
             is EmvViewModel.TransactionState.ProcessingOnline -> {
                 CircularProgressIndicator()
                 Text("Procesando transacción online...")
             }
+
             is EmvViewModel.TransactionState.Error -> {
                 val errorMessage = (transactionState as EmvViewModel.TransactionState.Error).message
                 Text("Error: $errorMessage", color = MaterialTheme.colorScheme.error)
             }
+
             is EmvViewModel.TransactionState.TransactionCompleted -> {
-                val resultCode = (transactionState as EmvViewModel.TransactionState.TransactionCompleted).resultCode
+                val resultCode =
+                    (transactionState as EmvViewModel.TransactionState.TransactionCompleted).resultCode
                 Text("Transacción completada con código: $resultCode")
             }
+
             else -> {}
         }
     }
-    
+
     // Diálogo de selección de aplicación
     if (showAppSelectionDialog) {
         AlertDialog(
@@ -141,7 +174,7 @@ fun EmvScreen(viewModel: EmvViewModel) {
             confirmButton = { }
         )
     }
-    
+
     // Diálogo de confirmación de número de tarjeta
     if (showCardConfirmationDialog) {
         AlertDialog(
@@ -166,7 +199,7 @@ fun EmvScreen(viewModel: EmvViewModel) {
             }
         )
     }
-    
+
     // Diálogo de ingreso de PIN
     if (showPinDialog) {
         AlertDialog(
@@ -203,5 +236,88 @@ fun EmvScreen(viewModel: EmvViewModel) {
                 }
             }
         )
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    // No podemos previsualizar con un ViewModel real, así que usamos una versión simplificada
+    MyApplicationTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Button(
+                    onClick = { },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(4.dp)
+                ) {
+                    Text(text = "Aid")
+                }
+
+                Button(
+                    onClick = { },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(4.dp)
+                ) {
+                    Text(text = "Capk")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = { },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp)
+            ) {
+                Text(text = "aid_num")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = { },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp)
+            ) {
+                Text(text = "aid_detail")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = { },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp)
+            ) {
+                Text(text = "Start emv")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = { },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp)
+            ) {
+                Text(text = "cancel emv")
+            }
+        }
     }
 }

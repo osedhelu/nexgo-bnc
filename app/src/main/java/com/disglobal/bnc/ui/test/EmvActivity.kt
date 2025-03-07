@@ -65,7 +65,7 @@ class EmvActivity : ComponentActivity(), EmvViewModel.PinInputListener,
         super.onCreate(savedInstanceState)
 
         // Inicializar ViewModel usando Hilt
-        viewModel = ViewModelProvider(this).get(EmvViewModel::class.java)
+        viewModel = ViewModelProvider(this)[EmvViewModel::class.java]
 
         // Configurar listeners
         viewModel.setPinInputListener(this)
@@ -98,8 +98,7 @@ class EmvActivity : ComponentActivity(), EmvViewModel.PinInputListener,
 
     // Implementación de EmvViewModel.CardSelectionListener
     override fun onCardSelectionRequired(
-        appNameList: List<String>,
-        appInfoList: List<CandidateAppInfoEntity>
+        appNameList: List<String>, appInfoList: List<CandidateAppInfoEntity>
     ) {
         // Esta función se maneja en la UI de Compose
     }
@@ -116,18 +115,102 @@ class EmvActivity : ComponentActivity(), EmvViewModel.PinInputListener,
     override fun onEmvProcessFinished(resultCode: Int) {
         runOnUiThread {
             val resultMessage = when (resultCode) {
+                // Códigos generales
                 SdkResult.Success -> "Transacción exitosa"
-                SdkResult.Emv_Qpboc_Offline, SdkResult.Emv_Offline_Accept -> "Transacción offline aprobada"
-                SdkResult.Emv_Qpboc_Online -> "Transacción online requerida"
-                SdkResult.Emv_Declined, SdkResult.Emv_Offline_Declined -> "Transacción rechazada"
-                SdkResult.Emv_Cancel -> "Transacción cancelada"
+                SdkResult.Fail -> "Operación fallida"
+                SdkResult.Param_In_Invalid -> "Parámetro inválido"
+                SdkResult.TimeOut -> "Tiempo de espera agotado"
+                SdkResult.Device_Not_Ready -> "Dispositivo no está listo"
+                SdkResult.NotSupport -> "Operación no soportada"
+                SdkResult.Cancel -> "Operación cancelada"
+
+                // Códigos de impresora
+                SdkResult.Printer_Print_Fail -> "Error al imprimir"
+                SdkResult.Printer_AddPrnStr_Fail -> "Error al agregar texto para imprimir"
+                SdkResult.Printer_Busy -> "Impresora ocupada"
+                SdkResult.Printer_PaperLack -> "Sin papel en la impresora"
+                SdkResult.Printer_Fault -> "Falla en la impresora"
+                SdkResult.Printer_TooHot -> "Impresora demasiado caliente"
+                SdkResult.Printer_NoDevice -> "No se encontró dispositivo de impresión"
+
+                // Códigos de escáner
+                SdkResult.Scanner_Customer_Exit -> "Escaneo cancelado por usuario"
+                SdkResult.Scanner_Other_Error -> "Error en el escáner"
+
+                // Códigos de detección facial
+                SdkResult.Face_Detect_Customer_Exit -> "Detección facial cancelada por usuario"
+                SdkResult.Face_Detect_Call_Frequently -> "Llamadas frecuentes a detección facial"
+                SdkResult.Face_Detect_Sdk_Not_Load -> "SDK de detección facial no cargado"
+                SdkResult.Face_Detect_Service_Unbind -> "Servicio de detección facial desvinculado"
+                SdkResult.Face_Detect_Other_Error -> "Error en detección facial"
+
+                // Códigos de puerto serie
+                SdkResult.SerialPort_Connect_Fail -> "Fallo de conexión de puerto serie"
+                SdkResult.SerialPort_Send_Fail -> "Fallo al enviar datos por puerto serie"
+                SdkResult.SerialPort_Port_Not_Open -> "Puerto serie no abierto"
+                SdkResult.SerialPort_DisConnected -> "Puerto serie desconectado"
+
+                // Códigos de lector de tarjetas magnéticas
+                SdkResult.MagCardReader_NoPermission_Error -> "Sin permiso para lector de tarjetas magnéticas"
+                SdkResult.MagCardReader_Other_Error -> "Error en lector de tarjetas magnéticas"
+
+                // Códigos de lector de tarjetas ICC
+                SdkResult.IccCardReader_Other_Error -> "Error en lector de tarjetas ICC"
+
+                // Códigos de teclado PIN
+                SdkResult.PinPad_No_Key_Error -> "No hay clave de PIN"
+                SdkResult.PinPad_KeyIdx_Error -> "Error de índice de clave"
+                SdkResult.PinPad_No_Pin_Input -> "No se ingresó PIN"
+                SdkResult.PinPad_Input_Cancel -> "Ingreso de PIN cancelado"
+                SdkResult.PinPad_Input_Timeout -> "Tiempo de espera de ingreso de PIN agotado"
+                SdkResult.PinPad_Open_Or_Close_Error -> "Error al abrir/cerrar teclado PIN"
+
+                // Códigos de EMV
+                SdkResult.Emv_Other_Interface -> "Usar otra interfaz"
+                SdkResult.Emv_Candidatelist_Empty -> "Lista de candidatos vacía"
+                SdkResult.Emv_FallBack -> "Transacción EMV fallback"
+                SdkResult.Emv_Qpboc_Offline -> "Transacción QPBOC offline"
+                SdkResult.Emv_Qpboc_Online -> "Transacción QPBOC online"
+                SdkResult.Emv_Offline_Accept -> "Transacción offline aceptada"
+                SdkResult.Emv_Card_Removed -> "Tarjeta removida"
                 SdkResult.Emv_Card_Block -> "Tarjeta bloqueada"
                 SdkResult.Emv_App_Block -> "Aplicación bloqueada"
                 SdkResult.Emv_App_Ineffect -> "Aplicación inefectiva"
                 SdkResult.Emv_App_Expired -> "Aplicación expirada"
-                SdkResult.Emv_Other_Interface -> "Usar otra interfaz"
-                SdkResult.Emv_Plz_See_Phone -> "Por favor vea el teléfono"
-                else -> "Código de resultado: $resultCode"
+                SdkResult.Emv_Cancel -> "Transacción EMV cancelada"
+                SdkResult.Emv_Declined -> "Transacción EMV rechazada"
+                SdkResult.Emv_Offline_Declined -> "Transacción offline rechazada"
+                SdkResult.Emv_Plz_See_Phone -> "Por favor, consulte el teléfono"
+                SdkResult.Emv_Terminate -> "Transacción EMV terminada"
+                SdkResult.Emv_USE_OTHER_CARD -> "Use otra tarjeta"
+                SdkResult.Emv_CTLS_Select_App -> "Seleccione aplicación sin contacto"
+                SdkResult.Emv_CTLS_EndApplication -> "Finalizar aplicación sin contacto"
+
+                // Códigos de tarjeta ICC
+                SdkResult.Icc_PullOut_Card -> "Tarjeta ICC retirada"
+                SdkResult.Icc_Parity_Err -> "Error de paridad en tarjeta ICC"
+                SdkResult.Icc_Channel_Err -> "Error de canal en tarjeta ICC"
+
+                // Códigos de tarjeta PICC
+                SdkResult.Picc_Not_Open -> "Lector de tarjeta PICC no abierto"
+                SdkResult.Picc_Not_Searched_Card -> "No se encontró tarjeta PICC"
+                SdkResult.Picc_Card_Too_Many -> "Demasiadas tarjetas PICC detectadas"
+
+                // Códigos de tarjeta M1
+                SdkResult.M1Card_Verify_Err -> "Error de verificación de tarjeta M1"
+
+                // Códigos de plataforma
+                SdkResult.Platform_Install_Already_Exists -> "Aplicación ya instalada"
+                SdkResult.Platform_Install_Invalid_Apk -> "APK inválido"
+                SdkResult.Platform_Install_Insufficient_Storage -> "Almacenamiento insuficiente"
+                SdkResult.Platform_Uninstall_User_Restricted -> "Desinstalación restringida por usuario"
+
+                // Otros códigos de EMV
+                SdkResult.Emv_Communicate_Timeout -> "Tiempo de espera de comunicación EMV"
+                SdkResult.Emv_CTLS_Torn -> "Transacción sin contacto incompleta"
+
+                // Código de error genérico
+                else -> "Código de resultado desconocido: $resultCode"
             }
             Toast.makeText(this, resultMessage, Toast.LENGTH_LONG).show()
         }
@@ -136,472 +219,6 @@ class EmvActivity : ComponentActivity(), EmvViewModel.PinInputListener,
     override fun onRequestShowToast(message: String) {
         runOnUiThread {
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        }
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.N)
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun EmvScreen(viewModel: EmvViewModel) {
-    val context = LocalContext.current
-    val transactionState by viewModel.transactionState()
-        .observeAsState(EmvViewModel.TransactionState.Idle)
-
-    var showPinDialog by remember { mutableStateOf(false) }
-
-    var showAppSelectionDialog by remember { mutableStateOf(false) }
-    var appNameList by remember { mutableStateOf<List<String>>(emptyList()) }
-
-    var showCardConfirmDialog by remember { mutableStateOf(false) }
-    var cardNumber by remember { mutableStateOf("") }
-
-    var showAmountDialog by remember { mutableStateOf(false) }
-    var amountInput by remember { mutableStateOf("") }
-
-    // Nuevo estado para mostrar el diálogo de procesamiento en línea
-    var showProcessingDialog by remember { mutableStateOf(false) }
-
-    // Observar cambios en el estado de la transacción
-    LaunchedEffect(transactionState) {
-        when (transactionState) {
-            is EmvViewModel.TransactionState.PinRequested -> {
-                showPinDialog = true
-            }
-
-            is EmvViewModel.TransactionState.SelectApplication -> {
-                appNameList =
-                    (transactionState as EmvViewModel.TransactionState.SelectApplication).appNames
-                showAppSelectionDialog = true
-            }
-
-            is EmvViewModel.TransactionState.ConfirmCardNumber -> {
-                cardNumber =
-                    (transactionState as EmvViewModel.TransactionState.ConfirmCardNumber).cardNumber
-                showCardConfirmDialog = true
-            }
-
-            is EmvViewModel.TransactionState.ProcessingOnline -> {
-                showProcessingDialog = true
-            }
-
-            is EmvViewModel.TransactionState.Completed,
-            is EmvViewModel.TransactionState.Error -> {
-                showProcessingDialog = false
-                showPinDialog = false
-            }
-
-            else -> {}
-        }
-    }
-
-    // Diálogo de PIN
-    if (showPinDialog) {
-        var pinInput by remember { mutableStateOf("") }
-        val textPin by viewModel.passwordPIN().observeAsState("")
-
-        Dialog(onDismissRequest = { }) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 11.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "$textPin",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-
-                    // Mostrar PIN enmascarado
-                    Text(
-                        text = "*".repeat(pinInput.length),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-
-                }
-            }
-        }
-    }
-
-    // Diálogo de selección de aplicación
-    if (showAppSelectionDialog) {
-        AlertDialog(
-            onDismissRequest = { },
-            title = { Text("Seleccione una aplicación") },
-            text = {
-                LazyColumn {
-                    items(appNameList.indices.toList()) { index ->
-                        Button(
-                            onClick = {
-                                showAppSelectionDialog = false
-                                viewModel.onApplicationSelected(index)
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp)
-                        ) {
-                            Text(appNameList[index])
-                        }
-                    }
-                }
-            },
-            confirmButton = { }
-        )
-    }
-
-    // Diálogo de confirmación de número de tarjeta
-    if (showCardConfirmDialog) {
-        AlertDialog(
-            onDismissRequest = { },
-            title = { Text("Confirme el número de tarjeta") },
-            text = { Text(cardNumber) },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showCardConfirmDialog = false
-                        viewModel.onCardNumberConfirmed(true)
-                    }
-                ) {
-                    Text("Confirmar")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        showCardConfirmDialog = false
-                        viewModel.onCardNumberConfirmed(false)
-                    }
-                ) {
-                    Text("Cancelar")
-                }
-            }
-        )
-    }
-
-    // Diálogo para ingresar monto
-    if (showAmountDialog) {
-        val keyboardController =
-            LocalSoftwareKeyboardController.current
-
-        AlertDialog(
-            onDismissRequest = { showAmountDialog = false },
-            title = { Text("Ingrese el monto") },
-            text = {
-                TextField(
-                    value = amountInput,
-                    onValueChange = { amountInput = it },
-                    label = { Text("Monto") },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = androidx.compose.foundation.text.KeyboardActions(
-                        onDone = {
-                            keyboardController?.hide()
-                            // Opcionalmente, también puedes procesar el monto aquí
-                            if (amountInput.isNotEmpty() && TextUtils.isDigitsOnly(amountInput)) {
-                                showAmountDialog = false
-                                viewModel.startEmvProcess(amountInput)
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "Ingrese un monto válido",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-                    ),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        keyboardController?.hide()
-                        if (amountInput.isNotEmpty() && TextUtils.isDigitsOnly(amountInput)) {
-                            showAmountDialog = false
-                            viewModel.startEmvProcess(amountInput)
-                        } else {
-                            Toast.makeText(context, "Ingrese un monto válido", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    }
-                ) {
-                    Text("Confirmar")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        keyboardController?.hide()
-                        showAmountDialog = false
-                    }
-                ) {
-                    Text("Cancelar")
-                }
-            }
-        )
-    }
-
-    // Pantalla principal
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Estado actual de la transacción
-        when (transactionState) {
-            is EmvViewModel.TransactionState.CardReading,
-            is EmvViewModel.TransactionState.ProcessingEmv -> {
-                CircularProgressIndicator(modifier = Modifier.padding(16.dp))
-                Text(
-                    text = if (transactionState is EmvViewModel.TransactionState.CardReading)
-                        "Leyendo tarjeta..."
-                    else
-                        "Procesando EMV...",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-
-            else -> {
-                // Primera fila con botones Aid y Capk
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Button(
-                        onClick = {
-                            val success = viewModel.initEmvAid()
-                            Toast.makeText(
-                                context,
-                                if (success) "AID inicializado" else "Error al inicializar AID",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(4.dp)
-                    ) {
-                        Text(text = "Aid")
-                    }
-
-                    Button(
-                        onClick = {
-                            val success = viewModel.initEmvCapk()
-                            Toast.makeText(
-                                context,
-                                if (success) "CAPK inicializado" else "Error al inicializar CAPK",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(4.dp)
-                    ) {
-                        Text(text = "Capk")
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Botón aid_num
-                Button(
-                    onClick = {
-                        val (aidNum, capkNum) = viewModel.checkAid()
-                        Toast.makeText(
-                            context,
-                            "AID: $aidNum, CAPK: $capkNum",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp)
-                ) {
-                    Text(text = "aid_num")
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Botón aid_detail
-                Button(
-                    onClick = {
-                        viewModel.checkAidDetail()
-                        Toast.makeText(context, "Por favor revisa el Logcat", Toast.LENGTH_SHORT)
-                            .show()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp)
-                ) {
-                    Text(text = "aid_detail")
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Botón Start emv
-                Button(
-                    onClick = {
-                        showAmountDialog = true
-                        amountInput = ""
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp)
-                ) {
-                    Text(text = "Start emv")
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Botón cancel emv
-                Button(
-                    onClick = {
-                        viewModel.cancelEmvProcess()
-                        Toast.makeText(context, "Proceso EMV cancelado", Toast.LENGTH_SHORT).show()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp)
-                ) {
-                    Text(text = "cancel emv")
-                }
-            }
-        }
-    }
-
-    // Diálogo de procesamiento en línea
-    if (showProcessingDialog) {
-        Dialog(onDismissRequest = { /* No permitir cerrar al tocar fuera */ }) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Procesando Pago",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(50.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text(
-                        text = "Conectando con el servidor...",
-                        textAlign = TextAlign.Center
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = "Por favor espere mientras procesamos su transacción",
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    // No podemos previsualizar con un ViewModel real, así que usamos una versión simplificada
-    MyApplicationTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Button(
-                    onClick = { },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(4.dp)
-                ) {
-                    Text(text = "Aid")
-                }
-
-                Button(
-                    onClick = { },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(4.dp)
-                ) {
-                    Text(text = "Capk")
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Button(
-                onClick = { },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-            ) {
-                Text(text = "aid_num")
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Button(
-                onClick = { },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-            ) {
-                Text(text = "aid_detail")
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Button(
-                onClick = { },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-            ) {
-                Text(text = "Start emv")
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Button(
-                onClick = { },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-            ) {
-                Text(text = "cancel emv")
-            }
         }
     }
 }

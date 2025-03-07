@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.disglobal.bnc.DigipayApi.domain.repositories.DigipayRepository
 import com.disglobal.bnc.features.common.emv.EmvRepository
 import com.disglobal.bnc.nexgobnc
 import com.google.gson.Gson
@@ -46,6 +47,7 @@ import javax.inject.Inject
 class EmvViewModel @Inject constructor(
     application: Application,
     private val emvRepository: EmvRepository,
+    private val apiService: DigipayRepository
 ) : AndroidViewModel(application), OnCardInfoListener,
     OnEmvProcessListener2, OnPinPadInputListener {
     private val _passwordPIN = MutableLiveData("")
@@ -233,18 +235,72 @@ class EmvViewModel @Inject constructor(
     // Implementaciones de los listeners del SDK
 
     private fun startEmvTest() {
+        // Verificar que el motor del dispositivo y el lector de tartas estén disponibles
+        val deviceEngine = deviceEngine
+        if (deviceEngine == null) {
+            Log.e("nexgo", "Device engine is null")
+            _transactionState.postValue(TransactionState.Error("Motor del dispositivo no disponible"))
+            emvProcessListener?.onRequestShowToast("Error: Motor del dispositivo no disponible")
+            return
+        }
+
+        val cardReader = deviceEngine.cardReader
+        if (cardReader == null) {
+            Log.e("nexgo", "Card reader is null")
+            _transactionState.postValue(TransactionState.Error("Lector de tarjetas no disponible"))
+            emvProcessListener?.onRequestShowToast("Error: Lector de tarjetas no disponible")
+            return
+        }
+
+        // Configurar tipos de ranuras para búsqueda
+        val slotTypes = HashSet<CardSlotTypeEnum>()
+        slotTypes.add(CardSlotTypeEnum.ICC1)  // Tarjeta de contacto
+        slotTypes.add(CardSlotTypeEnum.RF)    // Tarjeta sin contacto (NFC)
+
+        // Configurar parámetros adicionales
+        val searchTimeout = 60  // Tiempo de espera de búsqueda en segundos
+        
+        Log.d("nexgo", "Iniciando búsqueda de tarjetas...")
+        Log.d("nexgo", "Ranuras a buscar: $slotTypes")
+        Log.d("nexgo", "Tiempo de espera: $searchTimeout segundos")
+
+        // Cambiar estado de la transacción
         _transactionState.postValue(TransactionState.CardReading)
         emvProcessListener?.onEmvProcessStarted()
 
-        val cardReader = deviceEngine?.cardReader
-        val slotTypes = HashSet<CardSlotTypeEnum>()
-        slotTypes.add(CardSlotTypeEnum.ICC1)
-        slotTypes.add(CardSlotTypeEnum.RF)
-        cardReader?.searchCard(slotTypes, 60, this)
+        // Buscar tarjeta
+        val searchResult = cardReader.searchCard(slotTypes, searchTimeout, this)
+        
+        // Registrar resultado de la búsqueda
+        Log.d("nexgo", "Resultado de búsqueda de tarjeta: $searchResult")
+        
+        // Manejar posibles errores de búsqueda
+        if (searchResult != SdkResult.Success) {
+            val errorMessage = when (searchResult) {
+                SdkResult.TimeOut -> "Tiempo de espera de búsqueda agotado"
+                SdkResult.Device_Not_Ready -> "Dispositivo no está listo"
+                SdkResult.Picc_Not_Open -> "Lector de tarjetas sin contacto no abierto"
+                SdkResult.Picc_Not_Searched_Card -> "No se encontró tarjeta"
+                SdkResult.Picc_Card_Too_Many -> "Se detectaron múltiples tarjetas"
+                else -> "Error desconocido al buscar tarjeta: $searchResult"
+            }
+            
+            Log.e("nexgo", errorMessage)
+            _transactionState.postValue(TransactionState.Error(errorMessage))
+            emvProcessListener?.onRequestShowToast(errorMessage)
+        }
     }
 
     override fun onCardInfo(retCode: Int, cardInfo: CardInfoEntity?) {
+        Log.d("nexgo", "onCardInfo - Código de retorno: $retCode")
+        
         if (retCode == SdkResult.Success && cardInfo != null) {
+            // Registrar información detallada de la tarjeta
+            Log.d("nexgo", "Tarjeta detectada:")
+            Log.d("nexgo", "Ranura de tarjeta: ${cardInfo.cardExistslot}")
+            Log.d("nexgo", "Número de tarjeta: ${cardInfo.cardNo}")
+            Log.d("nexgo", "Track 2: ${cardInfo.tk2}")
+            
             mExistSlot = cardInfo.cardExistslot
             val transData = EmvTransConfigurationEntity()
             transData.transAmount = amount
@@ -259,8 +315,10 @@ class EmvViewModel @Inject constructor(
 
             transData.emvProcessFlowEnum = EmvProcessFlowEnum.EMV_PROCESS_FLOW_STANDARD
             if (cardInfo.cardExistslot == CardSlotTypeEnum.RF) {
+                Log.d("nexgo", "Tarjeta sin contacto detectada")
                 transData.emvEntryModeEnum = EmvEntryModeEnum.EMV_ENTRY_MODE_CONTACTLESS
             } else {
+                Log.d("nexgo", "Tarjeta de contacto detectada")
                 transData.emvEntryModeEnum = EmvEntryModeEnum.EMV_ENTRY_MODE_CONTACT
             }
 
@@ -272,11 +330,21 @@ class EmvViewModel @Inject constructor(
 
             // Iniciar proceso EMV
             _transactionState.postValue(TransactionState.ProcessingEmv)
-            Log.d("nexgo", "start emv ")
+            Log.d("nexgo", "Iniciando proceso EMV")
             emvHandler2?.emvProcess(transData, this)
         } else {
-            _transactionState.postValue(TransactionState.Error("Error al leer la tarjeta"))
-            emvProcessListener?.onRequestShowToast("Error al leer la tarjeta")
+            // Registrar detalles del error
+            val errorMessage = when (retCode) {
+                SdkResult.Picc_Not_Searched_Card -> "No se encontró tarjeta sin contacto"
+                SdkResult.Picc_Card_Too_Many -> "Se detectaron múltiples tarjetas"
+                SdkResult.Picc_Card_No_Activation -> "Tarjeta sin contacto no activada"
+                SdkResult.Icc_No_Reset_Card -> "No se pudo reiniciar la tarjeta ICC"
+                else -> "Error al leer la tarjeta: $retCode"
+            }
+            
+            Log.e("nexgo", errorMessage)
+            _transactionState.postValue(TransactionState.Error(errorMessage))
+            emvProcessListener?.onRequestShowToast(errorMessage)
         }
     }
 
