@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.AnnularScreen.Tabs
+package com.disglobal.bnc.features.AnnularScreen.Tabs
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
@@ -13,14 +13,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.disglobal.bnc.R
-import com.disglobal.bnc.ui.Screens.AnnularScreen.AnnulmentHelpers
+import com.disglobal.bnc.features.AnnularScreen.AnnulmentHelpers
 import com.disglobal.bnc.ui.components.ButtonPersonal
 import com.disglobal.bnc.ui.components.InputGlobal
 
 @Composable
 fun AnnularTab01() {
     var form by remember {
-        AnnulmentHelpers.form
+        com.disglobal.bnc.features.AnnularScreen.AnnulmentHelpers.form
     }
     Spacer(modifier = Modifier.size(8.dp))
     Text(
@@ -46,7 +46,7 @@ fun AnnularTab01() {
     Spacer(modifier = Modifier.size(10.dp))
     ButtonPersonal(
         title = "Continuar",
-        onClick = { AnnulmentHelpers.nextTabs() },
+        onClick = { com.disglobal.bnc.features.AnnularScreen.AnnulmentHelpers.nextTabs() },
 //        enabled = form.amount.isNotEmpty() && form.card.length == 16
     )
 }

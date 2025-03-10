@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.TestConnectionScreen
+package com.disglobal.bnc.features.TestConnectionScreen
 
 
 import androidx.compose.runtime.MutableState

@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.ReportScreen.tabs
+package com.disglobal.bnc.features.ReportScreen.tabs
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

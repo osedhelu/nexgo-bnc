@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.AnnularScreen
+package com.disglobal.bnc.features.AnnularScreen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,16 +10,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.disglobal.bnc.ui.Screens.AnnularScreen.Tabs.AnnularTab01
-import com.disglobal.bnc.ui.Screens.AnnularScreen.Tabs.AnnularTab02
-import com.disglobal.bnc.ui.Screens.AnnularScreen.Tabs.AnnularTab03
-import com.disglobal.bnc.ui.Screens.ShoppingScreen.tabs.TypeMethodCard
+import com.disglobal.bnc.features.AnnularScreen.Tabs.AnnularTab02
+import com.disglobal.bnc.features.AnnularScreen.Tabs.AnnularTab03
+import com.disglobal.bnc.features.ShoppingScreen.tabs.TypeMethodCard
 import com.disglobal.bnc.ui.components.Headers.HeaderHelper
 
 @Composable
 fun AnnularScreen(navController: NavController) {
     val numTab by remember {
-        AnnulmentHelpers.numTab
+        com.disglobal.bnc.features.AnnularScreen.AnnulmentHelpers.numTab
     }
 
     Column(

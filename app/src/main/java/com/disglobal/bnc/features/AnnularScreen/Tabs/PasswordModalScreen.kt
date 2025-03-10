@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.AnnularScreen.Tabs
+package com.disglobal.bnc.features.AnnularScreen.Tabs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,12 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.disglobal.bnc.ui.Screens.AnnularScreen.AnnulmentHelpers
+import com.disglobal.bnc.features.AnnularScreen.AnnulmentHelpers
 
 
 @Composable
 fun PasswordModalScreen(onDismiss: () -> Unit) {
-    var showDialog by remember { AnnulmentHelpers.showDialog }
+    var showDialog by remember { com.disglobal.bnc.features.AnnularScreen.AnnulmentHelpers.showDialog }
     var password by remember { mutableStateOf("") }
 
     Dialog(

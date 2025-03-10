@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.ShoppingScreen.tabs
+package com.disglobal.bnc.features.ShoppingScreen.tabs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.disglobal.bnc.R
-import com.disglobal.bnc.ui.Screens.ReportScreen.tabs.RowItem
+import com.disglobal.bnc.features.ReportScreen.tabs.RowItem
 
 @Composable
 fun CardResponse(status: Boolean = false, ButtonContainer: @Composable () -> Unit = {}) {

@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.ReportScreen.tabs
+package com.disglobal.bnc.features.ReportScreen.tabs
 
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.LinearEasing

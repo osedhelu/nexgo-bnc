@@ -16,6 +16,7 @@ import com.disglobal.bnc.data.remote.dto.makeNetworkCall
 import com.disglobal.bnc.utils.jsonStringify
 import com.nexgo.oaf.apiv3.emv.EmvHandler2
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 
@@ -41,7 +42,6 @@ class DigipayRepositoryImp @Inject constructor(
         }
 
     override suspend fun getInfoEchoTest(body: EchoTestDto): ApiResponseStatus<EchoTestDtoResp> {
-        println(jsonStringify(body))
         return makeNetworkCall {
             MiApiDataSource.getInfoEchoTest(body)
         }
@@ -80,34 +80,38 @@ class DigipayRepositoryImp @Inject constructor(
         )
     }
 
-    override suspend fun registerTransaction(
+    override suspend fun registerTransaction(requestBody: RequestBody): ApiResponseStatus<TransactionProcessResponse> =
+        makeNetworkCall {
+            MiApiDataSource.processTransaction(requestBody)
+        }
+
+
+    suspend fun registerTransaction1(
         emvHandler2: EmvHandler2?,
         amount: String,
         invoiceNumber: String,
         terminalData: GetInfoAffiliatesResp
-    ): ApiResponseStatus<TransactionProcessResponse> =
-        makeNetworkCall {
+    ): ApiResponseStatus<TransactionProcessResponse> = makeNetworkCall {
 
-            // Construir el mensaje TLV para la venta
-            val tlvMessage = TlvBuilder.buildSaleTlvMessage(
-                emvHandler2 = emvHandler2,
-                amount = amount,
-                merchantId = (terminalData.commerceId ?: "").toString(),
-                terminalId = (terminalData.deviceId ?: "").toString(),
-                batchNumber = terminalData.lotNumber ?: "",
-                stan = terminalData.stan ?: "",
-                invoiceNumber = invoiceNumber,
-                ksn = terminalData.ksn ?: ""
-            )
+        // Construir el mensaje TLV para la venta
+        val tlvMessage = TlvBuilder.buildSaleTlvMessage(
+            emvHandler2 = emvHandler2,
+            amount = amount,
+            merchantId = (terminalData.commerceId ?: "").toString(),
+            terminalId = (terminalData.deviceId ?: "").toString(),
+            batchNumber = terminalData.lotNumber ?: "",
+            stan = terminalData.stan ?: "",
+            invoiceNumber = invoiceNumber,
+            ksn = terminalData.ksn ?: ""
+        )
 
-            // Guardar el TLV para posibles reversos o advice
-            lastTransactionTlv = tlvMessage
+        // Guardar el TLV para posibles reversos o advice
+        lastTransactionTlv = tlvMessage
 
-            // Enviar la transacción al servidor
-            val requestBody =
-                tlvMessage.toRequestBody("application/octet-stream".toMediaTypeOrNull())
-            val response = MiApiDataSource.processTransaction(requestBody)
-            response
+        // Enviar la transacción al servidor
+        val requestBody = tlvMessage.toRequestBody("application/octet-stream".toMediaTypeOrNull())
+        val response = MiApiDataSource.processTransaction(requestBody)
+        response
 
-        }
+    }
 }

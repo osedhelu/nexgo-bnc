@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.ProfileScreen
+package com.disglobal.bnc.features.ProfileScreen
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable

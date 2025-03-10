@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.LoginScreen
+package com.disglobal.bnc.features.LoginScreen
 
 
 import androidx.compose.runtime.MutableState

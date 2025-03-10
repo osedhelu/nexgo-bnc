@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.ShoppingScreen.tabs
+package com.disglobal.bnc.features.ShoppingScreen.tabs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,12 +27,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.disglobal.bnc.R
-import com.disglobal.bnc.config.FontSize
 import com.disglobal.bnc.DigipayApi.domain.entities.AnnulmentDto
 import com.disglobal.bnc.DigipayApi.domain.entities.GetInfoAffiliatesResp
-import com.disglobal.bnc.ui.Screens.AnnularScreen.AnnulmentHelpers
-import com.disglobal.bnc.ui.Screens.ShoppingScreen.PagoHelper
+import com.disglobal.bnc.R
+import com.disglobal.bnc.config.FontSize
+import com.disglobal.bnc.features.ShoppingScreen.PagoHelper
 import com.disglobal.bnc.ui.components.ButtonPersonal
 import com.disglobal.bnc.ui.components.Toast.ToastHelpers
 import com.disglobal.bnc.utils.FormatePriceUtils
@@ -215,9 +214,10 @@ fun PagoTab04(navController: NavController) {
             })
             if (formResp.ok) {
                 ButtonPersonal(title = "Anular transferencia", onClick = {
-                    AnnulmentHelpers.form.value = AnnulmentDto(
-                        receiptId = "${formResp.data.receiptId}", rrn = "${formResp.data.rrn}"
-                    )
+                    com.disglobal.bnc.features.AnnularScreen.AnnulmentHelpers.form.value =
+                        AnnulmentDto(
+                            receiptId = "${formResp.data.receiptId}", rrn = "${formResp.data.rrn}"
+                        )
                     PagoHelper.nextTabs()
 
                 })

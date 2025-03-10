@@ -259,7 +259,7 @@ class EmvViewModel @Inject constructor(
 
         // Configurar parámetros adicionales
         val searchTimeout = 60  // Tiempo de espera de búsqueda en segundos
-        
+
         Log.d("nexgo", "Iniciando búsqueda de tarjetas...")
         Log.d("nexgo", "Ranuras a buscar: $slotTypes")
         Log.d("nexgo", "Tiempo de espera: $searchTimeout segundos")
@@ -270,10 +270,10 @@ class EmvViewModel @Inject constructor(
 
         // Buscar tarjeta
         val searchResult = cardReader.searchCard(slotTypes, searchTimeout, this)
-        
+
         // Registrar resultado de la búsqueda
         Log.d("nexgo", "Resultado de búsqueda de tarjeta: $searchResult")
-        
+
         // Manejar posibles errores de búsqueda
         if (searchResult != SdkResult.Success) {
             val errorMessage = when (searchResult) {
@@ -284,7 +284,7 @@ class EmvViewModel @Inject constructor(
                 SdkResult.Picc_Card_Too_Many -> "Se detectaron múltiples tarjetas"
                 else -> "Error desconocido al buscar tarjeta: $searchResult"
             }
-            
+
             Log.e("nexgo", errorMessage)
             _transactionState.postValue(TransactionState.Error(errorMessage))
             emvProcessListener?.onRequestShowToast(errorMessage)
@@ -293,14 +293,14 @@ class EmvViewModel @Inject constructor(
 
     override fun onCardInfo(retCode: Int, cardInfo: CardInfoEntity?) {
         Log.d("nexgo", "onCardInfo - Código de retorno: $retCode")
-        
+
         if (retCode == SdkResult.Success && cardInfo != null) {
             // Registrar información detallada de la tarjeta
             Log.d("nexgo", "Tarjeta detectada:")
             Log.d("nexgo", "Ranura de tarjeta: ${cardInfo.cardExistslot}")
             Log.d("nexgo", "Número de tarjeta: ${cardInfo.cardNo}")
             Log.d("nexgo", "Track 2: ${cardInfo.tk2}")
-            
+
             mExistSlot = cardInfo.cardExistslot
             val transData = EmvTransConfigurationEntity()
             transData.transAmount = amount
@@ -341,7 +341,7 @@ class EmvViewModel @Inject constructor(
                 SdkResult.Icc_No_Reset_Card -> "No se pudo reiniciar la tarjeta ICC"
                 else -> "Error al leer la tarjeta: $retCode"
             }
-            
+
             Log.e("nexgo", errorMessage)
             _transactionState.postValue(TransactionState.Error(errorMessage))
             emvProcessListener?.onRequestShowToast(errorMessage)

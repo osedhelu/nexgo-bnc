@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.ShoppingScreen.tabs
+package com.disglobal.bnc.features.ShoppingScreen.tabs
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.disglobal.bnc.data.remote.dto.ApiResponseStatus
-import com.disglobal.bnc.ui.Screens.ShoppingScreen.providers.PaymentProvider
+import com.disglobal.bnc.features.ShoppingScreen.providers.PaymentProvider
 import com.disglobal.bnc.ui.theme.secondary
 
 @Composable

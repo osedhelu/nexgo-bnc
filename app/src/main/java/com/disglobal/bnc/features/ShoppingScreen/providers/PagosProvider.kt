@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.ShoppingScreen.providers
+package com.disglobal.bnc.features.ShoppingScreen.providers
 
 
 import androidx.compose.runtime.MutableState

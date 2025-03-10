@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.TestConnectionScreen
+package com.disglobal.bnc.features.TestConnectionScreen
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -8,11 +8,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.disglobal.bnc.config.AFFILIATION_ID
-import com.disglobal.bnc.data.remote.dto.ApiResponseStatus
 import com.disglobal.bnc.DigipayApi.domain.entities.EchoTestDto
 import com.disglobal.bnc.DigipayApi.domain.entities.EchoTestDtoResp
-import com.disglobal.bnc.ui.Screens.TestConnectionScreen.widget.LoadingCustom
+import com.disglobal.bnc.config.AFFILIATION_ID
+import com.disglobal.bnc.data.remote.dto.ApiResponseStatus
+import com.disglobal.bnc.features.TestConnectionScreen.widget.LoadingCustom
 import com.disglobal.bnc.ui.components.StatusCustomScreen
 import com.disglobal.bnc.utils.jsonParse
 

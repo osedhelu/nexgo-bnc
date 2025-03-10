@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.TestConnectionScreen.widget
+package com.disglobal.bnc.features.TestConnectionScreen.widget
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

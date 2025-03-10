@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.ReportScreen.tabs
+package com.disglobal.bnc.features.ReportScreen.tabs
 
 
 import androidx.compose.foundation.background
@@ -26,7 +26,7 @@ import com.disglobal.bnc.data.local.database.Transaction
 import com.disglobal.bnc.data.remote.dto.ApiResponseStatus
 import com.disglobal.bnc.DigipayApi.domain.entities.GetInfoAffiliatesResp
 import com.disglobal.bnc.DigipayApi.domain.entities.LotSummaryResponse
-import com.disglobal.bnc.ui.Screens.ReportScreen.view_models.LotSummaryViewModel
+import com.disglobal.bnc.features.ReportScreen.view_models.LotSummaryViewModel
 
 
 @Composable

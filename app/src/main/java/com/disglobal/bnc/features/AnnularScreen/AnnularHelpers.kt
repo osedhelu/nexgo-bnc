@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.AnnularScreen
+package com.disglobal.bnc.features.AnnularScreen
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -15,13 +15,13 @@ object AnnulmentHelpers : ViewModel() {
 
     @Synchronized
     fun reset() {
-        form.value = AnnulmentDto("", "")
-        numTab.value = 0
-        formResp.value = AnnulmentRespDto("", "")
+        com.disglobal.bnc.features.AnnularScreen.AnnulmentHelpers.form.value = AnnulmentDto("", "")
+        com.disglobal.bnc.features.AnnularScreen.AnnulmentHelpers.numTab.value = 0
+        com.disglobal.bnc.features.AnnularScreen.AnnulmentHelpers.formResp.value = AnnulmentRespDto("", "")
     }
 
     fun nextTabs() {
-        numTab.value = numTab.value + 1
+        com.disglobal.bnc.features.AnnularScreen.AnnulmentHelpers.numTab.value = com.disglobal.bnc.features.AnnularScreen.AnnulmentHelpers.numTab.value + 1
     }
 
 }

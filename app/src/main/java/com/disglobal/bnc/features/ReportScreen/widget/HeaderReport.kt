@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.ReportScreen.widget
+package com.disglobal.bnc.features.ReportScreen.widget
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

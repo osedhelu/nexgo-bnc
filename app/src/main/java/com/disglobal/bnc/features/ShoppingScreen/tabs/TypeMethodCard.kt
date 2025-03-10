@@ -1,6 +1,5 @@
-package com.disglobal.bnc.ui.Screens.ShoppingScreen.tabs
+package com.disglobal.bnc.features.ShoppingScreen.tabs
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,15 +19,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.disglobal.bnc.ui.Screens.ShoppingScreen.PagoHelper
-import com.disglobal.bnc.ui.Screens.ShoppingScreen.providers.PaymentProvider
+import com.disglobal.bnc.features.ShoppingScreen.PagoHelper
 import com.disglobal.bnc.ui.components.Loading.IconType
 import com.disglobal.bnc.utils.convertirANumeroDecimal
 import kotlinx.coroutines.delay

@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.AnnularScreen.Tabs
+package com.disglobal.bnc.features.AnnularScreen.Tabs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.disglobal.bnc.R
 import com.disglobal.bnc.DigipayApi.domain.entities.GetInfoAffiliatesResp
-import com.disglobal.bnc.ui.Screens.AnnularScreen.AnnulmentHelpers
+import com.disglobal.bnc.features.AnnularScreen.AnnulmentHelpers
 import com.disglobal.bnc.ui.components.ButtonPersonal
 import com.disglobal.bnc.ui.components.RowItems
 import com.disglobal.bnc.utils.redidText
@@ -30,7 +30,7 @@ import com.disglobal.bnc.utils.redidText
 @Composable
 fun AnnularTab03(onClick: () -> Unit) {
     val form by remember {
-        AnnulmentHelpers.formResp
+        com.disglobal.bnc.features.AnnularScreen.AnnulmentHelpers.formResp
     }
     val ctx = LocalContext.current
     val commerce = GetInfoAffiliatesResp.getCommerce(ctx)

@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.test
+package com.disglobal.bnc.features.ShoppingScreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,13 +28,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.disglobal.bnc.data.remote.dto.ApiResponseStatus
 import com.disglobal.bnc.ui.theme.MyApplicationTheme
+import com.disglobal.bnc.utils.EmvCardReaderNew
 
 @Composable
-fun EmvScreen(viewModel: EmvViewModel) {
+fun EmvScreen(
+    navController: NavController,
+    viewModel: EmvViewModel = hiltViewModel()
+) {
     val transactionState by viewModel.transactionState()
-        .observeAsState(EmvViewModel.TransactionState.Idle)
+        .observeAsState(EmvCardReaderNew.TransactionState.Idle)
     val pinText by viewModel.passwordPIN().observeAsState("")
+
+    val stateTransacion by viewModel.status
 
     var amount by remember { mutableStateOf("1.00") }
     var showAppSelectionDialog by remember { mutableStateOf(false) }
@@ -43,26 +52,27 @@ fun EmvScreen(viewModel: EmvViewModel) {
     var appNames by remember { mutableStateOf(listOf<String>()) }
     var cardNumber by remember { mutableStateOf("") }
 
+
     // Observar cambios en el estado de la transacción
     LaunchedEffect(transactionState) {
         when (transactionState) {
-            is EmvViewModel.TransactionState.SelectApplication -> {
+            is EmvCardReaderNew.TransactionState.SelectApplication -> {
                 appNames =
-                    (transactionState as EmvViewModel.TransactionState.SelectApplication).appNames
+                    (transactionState as EmvCardReaderNew.TransactionState.SelectApplication).appNames
                 showAppSelectionDialog = true
             }
 
-            is EmvViewModel.TransactionState.ConfirmCardNumber -> {
+            is EmvCardReaderNew.TransactionState.ConfirmCardNumber -> {
                 cardNumber =
-                    (transactionState as EmvViewModel.TransactionState.ConfirmCardNumber).cardNumber
+                    (transactionState as EmvCardReaderNew.TransactionState.ConfirmCardNumber).cardNumber
                 showCardConfirmationDialog = true
             }
 
-            is EmvViewModel.TransactionState.PinRequested -> {
+            is EmvCardReaderNew.TransactionState.PinRequested -> {
                 showPinDialog = true
             }
 
-            is EmvViewModel.TransactionState.Completed -> {
+            is EmvCardReaderNew.TransactionState.Completed -> {
                 showAppSelectionDialog = false
                 showCardConfirmationDialog = false
                 showPinDialog = false
@@ -79,10 +89,17 @@ fun EmvScreen(viewModel: EmvViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = "Procesamiento EMV",
-            style = MaterialTheme.typography.headlineMedium
-        )
+        when (stateTransacion) {
+
+            is ApiResponseStatus.Error -> {
+                val errorMessage = (stateTransacion as ApiResponseStatus.Error).message
+                Text("Error: $errorMessage", color = MaterialTheme.colorScheme.error)
+            }
+
+            is ApiResponseStatus.Loading -> {}
+            is ApiResponseStatus.Success -> {}
+        }
+
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -115,33 +132,34 @@ fun EmvScreen(viewModel: EmvViewModel) {
 
         // Estado actual de la transacción
         when (transactionState) {
-            is EmvViewModel.TransactionState.Idle -> {
+            is EmvCardReaderNew.TransactionState.Idle -> {
                 Text("Listo para iniciar transacción")
             }
 
-            is EmvViewModel.TransactionState.CardReading -> {
+            is EmvCardReaderNew.TransactionState.CardReading -> {
                 CircularProgressIndicator()
                 Text("Esperando tarjeta...")
             }
 
-            is EmvViewModel.TransactionState.ProcessingEmv -> {
+            is EmvCardReaderNew.TransactionState.ProcessingEmv -> {
                 CircularProgressIndicator()
                 Text("Procesando EMV...")
             }
 
-            is EmvViewModel.TransactionState.ProcessingOnline -> {
+            is EmvCardReaderNew.TransactionState.ProcessingOnline -> {
                 CircularProgressIndicator()
                 Text("Procesando transacción online...")
             }
 
-            is EmvViewModel.TransactionState.Error -> {
-                val errorMessage = (transactionState as EmvViewModel.TransactionState.Error).message
+            is EmvCardReaderNew.TransactionState.Error -> {
+                val errorMessage =
+                    (transactionState as EmvCardReaderNew.TransactionState.Error).message
                 Text("Error: $errorMessage", color = MaterialTheme.colorScheme.error)
             }
 
-            is EmvViewModel.TransactionState.TransactionCompleted -> {
+            is EmvCardReaderNew.TransactionState.TransactionCompleted -> {
                 val resultCode =
-                    (transactionState as EmvViewModel.TransactionState.TransactionCompleted).resultCode
+                    (transactionState as EmvCardReaderNew.TransactionState.TransactionCompleted).resultCode
                 Text("Transacción completada con código: $resultCode")
             }
 
@@ -151,34 +169,27 @@ fun EmvScreen(viewModel: EmvViewModel) {
 
     // Diálogo de selección de aplicación
     if (showAppSelectionDialog) {
-        AlertDialog(
-            onDismissRequest = { },
-            title = { Text("Seleccione una aplicación") },
-            text = {
-                Column {
-                    appNames.forEachIndexed { index, appName ->
-                        Button(
-                            onClick = {
-                                viewModel.onApplicationSelected(index)
-                                showAppSelectionDialog = false
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp)
-                        ) {
-                            Text(appName)
-                        }
+        AlertDialog(onDismissRequest = { }, title = { Text("Seleccione una aplicación") }, text = {
+            Column {
+                appNames.forEachIndexed { index, appName ->
+                    Button(
+                        onClick = {
+                            viewModel.onApplicationSelected(index)
+                            showAppSelectionDialog = false
+                        }, modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                    ) {
+                        Text(appName)
                     }
                 }
-            },
-            confirmButton = { }
-        )
+            }
+        }, confirmButton = { })
     }
 
     // Diálogo de confirmación de número de tarjeta
     if (showCardConfirmationDialog) {
-        AlertDialog(
-            onDismissRequest = { },
+        AlertDialog(onDismissRequest = { },
             title = { Text("Confirmar número de tarjeta") },
             text = { Text("Número de tarjeta: $cardNumber") },
             confirmButton = {
@@ -196,46 +207,38 @@ fun EmvScreen(viewModel: EmvViewModel) {
                 }) {
                     Text("Cancelar")
                 }
-            }
-        )
+            })
     }
 
     // Diálogo de ingreso de PIN
     if (showPinDialog) {
-        AlertDialog(
-            onDismissRequest = { },
-            title = { Text("Ingrese su PIN") },
-            text = {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(pinText)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("Use el teclado físico del dispositivo para ingresar su PIN")
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        if (viewModel.validatePin(pinText)) {
-                            viewModel.onPinInputComplete(true, false)
-                            showPinDialog = false
-                        }
-                    },
-                    enabled = pinText.length >= 4
-                ) {
-                    Text("Confirmar")
-                }
-            },
-            dismissButton = {
-                Button(onClick = {
-                    viewModel.onPinInputCancelled()
-                    showPinDialog = false
-                }) {
-                    Text("Cancelar")
-                }
+        AlertDialog(onDismissRequest = { }, title = { Text("Ingrese su PIN") }, text = {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(pinText)
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Use el teclado físico del dispositivo para ingresar su PIN")
             }
-        )
+        }, confirmButton = {
+            Button(
+                onClick = {
+                    if (viewModel.validatePin(pinText)) {
+                        viewModel.onPinInputComplete(true, false)
+                        showPinDialog = false
+                    }
+                }, enabled = pinText.length >= 4
+            ) {
+                Text("Confirmar")
+            }
+        }, dismissButton = {
+            Button(onClick = {
+                viewModel.onPinInputCancelled()
+                showPinDialog = false
+            }) {
+                Text("Cancelar")
+            }
+        })
     }
 }
 
@@ -253,12 +256,10 @@ fun DefaultPreview() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
-                    onClick = { },
-                    modifier = Modifier
+                    onClick = { }, modifier = Modifier
                         .weight(1f)
                         .padding(4.dp)
                 ) {
@@ -266,8 +267,7 @@ fun DefaultPreview() {
                 }
 
                 Button(
-                    onClick = { },
-                    modifier = Modifier
+                    onClick = { }, modifier = Modifier
                         .weight(1f)
                         .padding(4.dp)
                 ) {
@@ -278,8 +278,7 @@ fun DefaultPreview() {
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
-                onClick = { },
-                modifier = Modifier
+                onClick = { }, modifier = Modifier
                     .fillMaxWidth()
                     .padding(4.dp)
             ) {
@@ -289,8 +288,7 @@ fun DefaultPreview() {
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
-                onClick = { },
-                modifier = Modifier
+                onClick = { }, modifier = Modifier
                     .fillMaxWidth()
                     .padding(4.dp)
             ) {
@@ -300,8 +298,7 @@ fun DefaultPreview() {
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
-                onClick = { },
-                modifier = Modifier
+                onClick = { }, modifier = Modifier
                     .fillMaxWidth()
                     .padding(4.dp)
             ) {
@@ -311,8 +308,7 @@ fun DefaultPreview() {
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
-                onClick = { },
-                modifier = Modifier
+                onClick = { }, modifier = Modifier
                     .fillMaxWidth()
                     .padding(4.dp)
             ) {

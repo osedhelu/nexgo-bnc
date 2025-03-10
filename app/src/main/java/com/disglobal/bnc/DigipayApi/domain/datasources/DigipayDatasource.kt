@@ -36,15 +36,13 @@ interface DigipayDatasource {
      * Validación de terminal
      * @param taxID RIF del comercio
      * @param serial Serial del dispositivo POS
-     * @param ksn Key Serial Number (opcional)
      * @param appName Nombre de Aplicación (opcional)
      * @param appVersion Versión de Aplicación (opcional)
      */
-    @GET("$GET_INFO_AFFILIATION/{taxID}/{serial}/")
+    @GET("$GET_INFO_AFFILIATION/{taxID}/{serial}")
     suspend fun getInfoAffiliation(
         @Path("taxID") taxID: String,
         @Path("serial") serial: String,
-        @Query("ksn") ksn: String? = null,
         @Query("appName") appName: String? = null,
         @Query("appVersion") appVersion: String? = null
     ): GetInfoAffiliatesResp
@@ -85,8 +83,7 @@ interface DigipayDatasource {
      * Envía un mensaje TLV en el body para procesar la transacción
      */
     @Headers(
-        "Accept: */*",
-        "Content-Type: text/plain"
+        "Accept: */*", "Content-Type: text/plain"
     )
     @POST(PATH_GET_TRANSACTION)
     suspend fun processTransaction(

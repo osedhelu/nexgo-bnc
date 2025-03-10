@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.ReportScreen.view_models
+package com.disglobal.bnc.features.ReportScreen.view_models
 
 
 import androidx.compose.runtime.MutableState

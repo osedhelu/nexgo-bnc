@@ -1,10 +1,12 @@
-package com.disglobal.bnc.ui.Screens.LoginScreen
+package com.disglobal.bnc.features.LoginScreen
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +39,8 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
     val state by remember { viewModel.status }
     var getInfoAffiliatesResp by remember { mutableStateOf(true) }
     var terminalCodeVisibility by rememberSaveable { mutableStateOf(false) }
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
     var taxId by rememberSaveable {
         mutableStateOf("J88888888888")
     }
@@ -146,8 +150,15 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
                     }
 
                     is ApiResponseStatus.Error -> {
+                        // Mostrar el diálogo de error
+                        val error = (state as ApiResponseStatus.Error<GetInfoAffiliatesResp>)
+                        errorMessage = error.message
+                        showErrorDialog = true
+                        
                         ButtonPersonal(title = "Volver", enabled = true, onClick = {
                             getInfoAffiliatesResp = true
+                            // Asegurarse de que el diálogo se cierre al volver
+                            showErrorDialog = false
                         })
                     }
                 }
@@ -156,5 +167,27 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
 
 
         }
+    }
+    
+    // Diálogo de error
+    if (showErrorDialog) {
+        AlertDialog(
+            onDismissRequest = { 
+                showErrorDialog = false 
+            },
+            title = { Text("Error") },
+            text = { Text(errorMessage) },
+            confirmButton = {
+                TextButton(
+                    onClick = { 
+                        showErrorDialog = false 
+                        // También podemos restablecer el estado para permitir una nueva consulta
+                        getInfoAffiliatesResp = true
+                    }
+                ) {
+                    Text("Aceptar")
+                }
+            }
+        )
     }
 }

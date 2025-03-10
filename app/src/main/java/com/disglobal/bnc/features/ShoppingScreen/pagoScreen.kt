@@ -1,12 +1,12 @@
-package com.disglobal.bnc.ui.Screens.ShoppingScreen
+package com.disglobal.bnc.features.ShoppingScreen
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
-import com.disglobal.bnc.ui.Screens.ShoppingScreen.tabs.PagoTab01
-import com.disglobal.bnc.ui.Screens.ShoppingScreen.tabs.PagoTab03
-import com.disglobal.bnc.ui.Screens.ShoppingScreen.tabs.PagoTab04
-import com.disglobal.bnc.ui.Screens.ShoppingScreen.tabs.ScreenPassword
-import com.disglobal.bnc.ui.Screens.ShoppingScreen.tabs.TypeMethodCard
+import com.disglobal.bnc.features.ShoppingScreen.tabs.PagoTab01
+import com.disglobal.bnc.features.ShoppingScreen.tabs.PagoTab03
+import com.disglobal.bnc.features.ShoppingScreen.tabs.PagoTab04
+import com.disglobal.bnc.features.ShoppingScreen.tabs.ScreenPassword
+import com.disglobal.bnc.features.ShoppingScreen.tabs.TypeMethodCard
 import com.disglobal.bnc.ui.test.EmvViewModel
 
 

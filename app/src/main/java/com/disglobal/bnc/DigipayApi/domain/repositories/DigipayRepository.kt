@@ -9,6 +9,7 @@ import com.disglobal.bnc.DigipayApi.domain.entities.TransacionDtoResp
 import com.disglobal.bnc.DigipayApi.domain.entities.TransactionProcessResponse
 import com.disglobal.bnc.data.remote.dto.ApiResponseStatus
 import com.nexgo.oaf.apiv3.emv.EmvHandler2
+import okhttp3.RequestBody
 
 
 interface DigipayRepository {
@@ -40,10 +41,7 @@ interface DigipayRepository {
     ): ApiResponseStatus<Unit>
 
     suspend fun registerTransaction(
-        emvHandler2: EmvHandler2?,
-        amount: String,
-        invoiceNumber: String,
-        terminalData: GetInfoAffiliatesResp
+        requestBody: RequestBody
     ): ApiResponseStatus<TransactionProcessResponse>
 }
 

@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.ShoppingScreen.tabs
+package com.disglobal.bnc.features.ShoppingScreen.tabs
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,17 +9,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.disglobal.bnc.R
-import com.disglobal.bnc.ui.Screens.ShoppingScreen.PagoHelper
-import com.disglobal.bnc.ui.Screens.ShoppingScreen.providers.PaymentProvider
+import com.disglobal.bnc.features.ShoppingScreen.PagoHelper
 import com.disglobal.bnc.ui.components.CustomKeyboard
 import com.disglobal.bnc.utils.FormatePriceUtilString
 

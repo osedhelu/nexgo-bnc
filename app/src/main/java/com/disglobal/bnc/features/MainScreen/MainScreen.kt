@@ -1,4 +1,4 @@
-package com.disglobal.bnc.ui.Screens.MainScreen
+package com.disglobal.bnc.features.MainScreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,9 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.disglobal.bnc.R
-import com.disglobal.bnc.ui.Screens.AnnularScreen.AnnulmentHelpers
-import com.disglobal.bnc.ui.Screens.ReportScreen.ReportHelper
-import com.disglobal.bnc.ui.Screens.ShoppingScreen.PagoHelper
+import com.disglobal.bnc.features.ReportScreen.ReportHelper
+import com.disglobal.bnc.features.ShoppingScreen.PagoHelper
 import com.disglobal.bnc.ui.components.Headers.HeaderHelper
 import com.disglobal.bnc.ui.theme.primary
 
@@ -66,7 +65,7 @@ fun MainScreen(navController: NavController) {
                 onClick = {
                     navController.navigate(item.path)
                     PagoHelper.reset()
-                    AnnulmentHelpers.reset()
+                    com.disglobal.bnc.features.AnnularScreen.AnnulmentHelpers.reset()
                     ReportHelper.reset()
                     HeaderHelper.show()
                 }) {
