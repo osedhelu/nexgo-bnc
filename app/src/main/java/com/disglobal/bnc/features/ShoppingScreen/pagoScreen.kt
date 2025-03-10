@@ -7,10 +7,11 @@ import com.disglobal.bnc.ui.Screens.ShoppingScreen.tabs.PagoTab03
 import com.disglobal.bnc.ui.Screens.ShoppingScreen.tabs.PagoTab04
 import com.disglobal.bnc.ui.Screens.ShoppingScreen.tabs.ScreenPassword
 import com.disglobal.bnc.ui.Screens.ShoppingScreen.tabs.TypeMethodCard
+import com.disglobal.bnc.ui.test.EmvViewModel
 
 
 @Composable
-fun PagoScreen(navController: NavController, numTab: Int = 1) {
+fun PagoScreen(navController: NavController, numTab: Int = 1, viewModelNexgo: EmvViewModel) {
     when (numTab) {
         1 -> {
             PagoTab01(navController = navController)
