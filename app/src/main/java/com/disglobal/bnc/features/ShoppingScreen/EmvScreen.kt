@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -89,17 +90,24 @@ fun EmvScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        when (stateTransacion) {
+        Text(
+            text = "Procesamiento de Pago EMV",
+            style = MaterialTheme.typography.headlineMedium,
+            textAlign = TextAlign.Center
+        )
 
+        when (stateTransacion) {
             is ApiResponseStatus.Error -> {
                 val errorMessage = (stateTransacion as ApiResponseStatus.Error).message
                 Text("Error: $errorMessage", color = MaterialTheme.colorScheme.error)
             }
 
             is ApiResponseStatus.Loading -> {}
-            is ApiResponseStatus.Success -> {}
+            is ApiResponseStatus.Success -> {
+                val message = (stateTransacion as ApiResponseStatus.Success).data
+                Text(message, color = MaterialTheme.colorScheme.primary)
+            }
         }
-
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -130,6 +138,8 @@ fun EmvScreen(
             Text("Cancelar")
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
+
         // Estado actual de la transacción
         when (transactionState) {
             is EmvCardReaderNew.TransactionState.Idle -> {
@@ -138,29 +148,42 @@ fun EmvScreen(
 
             is EmvCardReaderNew.TransactionState.CardReading -> {
                 CircularProgressIndicator()
-                Text("Esperando tarjeta...")
+                Text("Esperando tarjeta...", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    "Por favor inserte o acerque su tarjeta al lector",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
 
             is EmvCardReaderNew.TransactionState.ProcessingEmv -> {
                 CircularProgressIndicator()
-                Text("Procesando EMV...")
+                Text("Procesando EMV...", style = MaterialTheme.typography.bodyLarge)
+                Text("Por favor no retire la tarjeta", style = MaterialTheme.typography.bodyMedium)
             }
 
             is EmvCardReaderNew.TransactionState.ProcessingOnline -> {
                 CircularProgressIndicator()
-                Text("Procesando transacción online...")
+                Text("Procesando transacción online...", style = MaterialTheme.typography.bodyLarge)
+                Text("Conectando con el servidor", style = MaterialTheme.typography.bodyMedium)
             }
 
             is EmvCardReaderNew.TransactionState.Error -> {
                 val errorMessage =
                     (transactionState as EmvCardReaderNew.TransactionState.Error).message
-                Text("Error: $errorMessage", color = MaterialTheme.colorScheme.error)
+                Text(
+                    "Error: $errorMessage",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
 
             is EmvCardReaderNew.TransactionState.TransactionCompleted -> {
                 val resultCode =
                     (transactionState as EmvCardReaderNew.TransactionState.TransactionCompleted).resultCode
-                Text("Transacción completada con código: $resultCode")
+                Text(
+                    "Transacción completada con código: $resultCode",
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
 
             else -> {}
@@ -169,27 +192,33 @@ fun EmvScreen(
 
     // Diálogo de selección de aplicación
     if (showAppSelectionDialog) {
-        AlertDialog(onDismissRequest = { }, title = { Text("Seleccione una aplicación") }, text = {
-            Column {
-                appNames.forEachIndexed { index, appName ->
-                    Button(
-                        onClick = {
-                            viewModel.onApplicationSelected(index)
-                            showAppSelectionDialog = false
-                        }, modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                    ) {
-                        Text(appName)
+        AlertDialog(
+            onDismissRequest = { },
+            title = { Text("Seleccione una aplicación") },
+            text = {
+                Column {
+                    appNames.forEachIndexed { index, appName ->
+                        Button(
+                            onClick = {
+                                viewModel.onApplicationSelected(index)
+                                showAppSelectionDialog = false
+                            }, modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                        ) {
+                            Text(appName)
+                        }
                     }
                 }
-            }
-        }, confirmButton = { })
+            },
+            confirmButton = { }
+        )
     }
 
     // Diálogo de confirmación de número de tarjeta
     if (showCardConfirmationDialog) {
-        AlertDialog(onDismissRequest = { },
+        AlertDialog(
+            onDismissRequest = { },
             title = { Text("Confirmar número de tarjeta") },
             text = { Text("Número de tarjeta: $cardNumber") },
             confirmButton = {
@@ -207,38 +236,45 @@ fun EmvScreen(
                 }) {
                     Text("Cancelar")
                 }
-            })
+            }
+        )
     }
 
     // Diálogo de ingreso de PIN
     if (showPinDialog) {
-        AlertDialog(onDismissRequest = { }, title = { Text("Ingrese su PIN") }, text = {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(pinText)
-                Spacer(modifier = Modifier.height(16.dp))
-                Text("Use el teclado físico del dispositivo para ingresar su PIN")
+        AlertDialog(
+            onDismissRequest = { },
+            title = { Text("Ingrese su PIN") },
+            text = {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(pinText, style = MaterialTheme.typography.headlineMedium)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("Use el teclado físico del dispositivo para ingresar su PIN")
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (viewModel.validatePin(pinText)) {
+                            viewModel.onPinInputComplete(true, false)
+                            showPinDialog = false
+                        }
+                    }, enabled = pinText.length >= 4
+                ) {
+                    Text("Confirmar")
+                }
+            },
+            dismissButton = {
+                Button(onClick = {
+                    viewModel.onPinInputCancelled()
+                    showPinDialog = false
+                }) {
+                    Text("Cancelar")
+                }
             }
-        }, confirmButton = {
-            Button(
-                onClick = {
-                    if (viewModel.validatePin(pinText)) {
-                        viewModel.onPinInputComplete(true, false)
-                        showPinDialog = false
-                    }
-                }, enabled = pinText.length >= 4
-            ) {
-                Text("Confirmar")
-            }
-        }, dismissButton = {
-            Button(onClick = {
-                viewModel.onPinInputCancelled()
-                showPinDialog = false
-            }) {
-                Text("Cancelar")
-            }
-        })
+        )
     }
 }
 
@@ -255,65 +291,44 @@ fun DefaultPreview() {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Button(
-                    onClick = { }, modifier = Modifier
-                        .weight(1f)
-                        .padding(4.dp)
-                ) {
-                    Text(text = "Aid")
-                }
+            Text(
+                text = "Procesamiento de Pago EMV",
+                style = MaterialTheme.typography.headlineMedium,
+                textAlign = TextAlign.Center
+            )
 
-                Button(
-                    onClick = { }, modifier = Modifier
-                        .weight(1f)
-                        .padding(4.dp)
-                ) {
-                    Text(text = "Capk")
-                }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = "1.00",
+                onValueChange = { },
+                label = { Text("Monto") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = { },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Iniciar Transacción")
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
-                onClick = { }, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
+                onClick = { },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
-                Text(text = "aid_num")
+                Text("Cancelar")
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = { }, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-            ) {
-                Text(text = "aid_detail")
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Button(
-                onClick = { }, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-            ) {
-                Text(text = "Start emv")
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Button(
-                onClick = { }, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-            ) {
-                Text(text = "cancel emv")
-            }
+            Text("Listo para iniciar transacción")
         }
     }
 }

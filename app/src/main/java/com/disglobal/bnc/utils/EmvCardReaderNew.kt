@@ -729,4 +729,49 @@ class EmvCardReaderNew(
     fun stopEmitting() {
         job?.cancel()
     }
+
+    /**
+     * Obtiene la información de la tarjeta actual
+     * @return Mapa con la información de la tarjeta
+     */
+    fun getCardInfo(): Map<String, String> {
+        val cardInfo = HashMap<String, String>()
+        
+        // Obtener información básica de la tarjeta
+        cardInfo["cardNumber"] = cardNo ?: ""
+        
+        // Obtener datos de la tarjeta EMV
+        val cardInfoEntity = emvHandler.emvCardDataInfo
+        if (cardInfoEntity != null) {
+            cardInfo["expiredDate"] = cardInfoEntity.expiredDate ?: ""
+            cardInfo["track2"] = cardInfoEntity.tk2 ?: ""
+            cardInfo["serviceCode"] = cardInfoEntity.serviceCode ?: ""
+            cardInfo["maskCardNo"] = cardInfoEntity.maskCardNo ?: ""
+        }
+        
+        // Obtener tipo de tarjeta (contacto o sin contacto)
+        cardInfo["entryMode"] = if (mExistSlot == CardSlotTypeEnum.RF) "Contactless" else "Contact"
+        
+        // Obtener AID (Application Identifier)
+        val aid = emvHandler.getTlv(byteArrayOf(0x4F), EmvDataSourceEnum.FROM_KERNEL)
+        if (aid != null) {
+            cardInfo["aid"] = ByteUtils.byteArray2HexString(aid)
+        }
+        
+        // Obtener nombre del titular (si está disponible)
+        val cardholderName = emvHandler.getTlv(byteArrayOf(0x5F, 0x20.toByte()), EmvDataSourceEnum.FROM_KERNEL)
+        if (cardholderName != null) {
+            cardInfo["cardholderName"] = ByteUtils.byteArray2HexString(cardholderName)
+        }
+        
+        return cardInfo
+    }
+
+    /**
+     * Obtiene el campo 55 (EMV Data) completo para enviar al servidor
+     * @return Campo 55 en formato hexadecimal
+     */
+    fun getField55(): String {
+        return buildField55()
+    }
 }

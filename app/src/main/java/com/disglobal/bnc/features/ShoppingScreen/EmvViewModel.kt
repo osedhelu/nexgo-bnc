@@ -10,8 +10,12 @@ import com.disglobal.bnc.DigipayApi.domain.repositories.DigipayRepository
 import com.disglobal.bnc.data.remote.dto.ApiResponseStatus
 import com.disglobal.bnc.utils.EmvCardReaderNew
 import com.disglobal.bnc.utils.EmvCardReaderNew.TransactionState
+import com.disglobal.bnc.utils.EmvConfigLoader
+import com.google.gson.Gson
+import com.nexgo.common.ByteUtils
 import com.nexgo.oaf.apiv3.SdkResult
 import com.nexgo.oaf.apiv3.emv.CandidateAppInfoEntity
+import com.nexgo.oaf.apiv3.emv.EmvDataSourceEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,6 +24,7 @@ import javax.inject.Inject
 class EmvViewModel @Inject constructor(
     private val emvProcessor: EmvCardReaderNew,
     private val digipayRepository: DigipayRepository,
+    private val emvConfigLoader: EmvConfigLoader
 ) : ViewModel(), EmvCardReaderNew.PinInputListener, EmvCardReaderNew.CardSelectionListener,
     EmvCardReaderNew.EmvProcessListener {
     private val TAG = "EmvViewModel"
@@ -30,17 +35,41 @@ class EmvViewModel @Inject constructor(
     private val _transactionState = MutableLiveData<TransactionState>()
     fun transactionState(): LiveData<TransactionState> = _transactionState
 
+    // LiveData para la entrada de PIN
+    val status: MutableState<ApiResponseStatus<String>> =
+        mutableStateOf(ApiResponseStatus.Loading())
 
     init {
-        onListenerTransfer()
-        onListenerPassword()
+        // Configurar listeners para observar cambios en el estado de la transacción
+        observeTransactionState()
+        observePasswordPIN()
+        
+        // Configurar listeners para eventos EMV
         emvProcessor.setPinInputListener(this)
         emvProcessor.setCardSelectionListener(this)
         emvProcessor.setEmvProcessListener(this)
-
+        
+        // Inicializar configuraciones EMV
+        initializeEmvConfigurations()
     }
 
-    private fun onListenerTransfer() {
+    private fun initializeEmvConfigurations() {
+        viewModelScope.launch {
+            try {
+                val result = emvConfigLoader.initEmvConfigurations()
+                if (result) {
+                    val (aidCount, capkCount) = emvConfigLoader.checkAidAndCapk()
+                    status.value = ApiResponseStatus.Success("Configuraciones EMV inicializadas: $aidCount AIDs, $capkCount CAPKs")
+                } else {
+                    status.value = ApiResponseStatus.Error("Error al inicializar configuraciones EMV")
+                }
+            } catch (e: Exception) {
+                status.value = ApiResponseStatus.Error("Error: ${e.message}")
+            }
+        }
+    }
+
+    private fun observeTransactionState() {
         viewModelScope.launch {
             emvProcessor.transactionState.collect {
                 _transactionState.postValue(it)
@@ -48,7 +77,7 @@ class EmvViewModel @Inject constructor(
         }
     }
 
-    private fun onListenerPassword() {
+    private fun observePasswordPIN() {
         viewModelScope.launch {
             emvProcessor.passwordPIN.collect {
                 _passwordPIN.postValue(it)
@@ -56,9 +85,8 @@ class EmvViewModel @Inject constructor(
         }
     }
 
-    fun startEmvProcess(
-        amountValue: String
-    ) {
+    // Métodos para interactuar con el procesador EMV
+    fun startEmvProcess(amountValue: String) {
         status.value = ApiResponseStatus.Loading()
         emvProcessor.startEmvProcess(amountValue)
     }
@@ -76,7 +104,7 @@ class EmvViewModel @Inject constructor(
     }
 
     fun validatePin(pin: String): Boolean {
-        return emvProcessor.validatePin(pin)
+        return pin.length in 4..6 && pin.all { it.isDigit() }
     }
 
     fun onPinInputComplete(success: Boolean, isNoPin: Boolean) {
@@ -87,10 +115,7 @@ class EmvViewModel @Inject constructor(
         emvProcessor.onPinInputCancelled()
     }
 
-    // LiveData para la entrada de PIN
-    val status: MutableState<ApiResponseStatus<String>> =
-        mutableStateOf(ApiResponseStatus.Loading())    // Implementación de EmvViewModel.PinInputListener
-
+    // Implementación de EmvCardReaderNew.PinInputListener
     override fun onPinTextChanged(pinText: String) {
         // Esta función se maneja en la UI de Compose
     }
@@ -100,10 +125,10 @@ class EmvViewModel @Inject constructor(
     }
 
     override fun onPinInputFailed(message: String) {
-        status.value = ApiResponseStatus.Success(message)
+        status.value = ApiResponseStatus.Error(message)
     }
 
-    // Implementación de EmvViewModel.CardSelectionListener
+    // Implementación de EmvCardReaderNew.CardSelectionListener
     override fun onCardSelectionRequired(
         appNameList: List<String>, appInfoList: List<CandidateAppInfoEntity>
     ) {
@@ -114,9 +139,9 @@ class EmvViewModel @Inject constructor(
         // Esta función se maneja en la UI de Compose
     }
 
-    // Implementación de EmvViewModel.EmvProcessListener
+    // Implementación de EmvCardReaderNew.EmvProcessListener
     override fun onEmvProcessStarted() {
-        // Esta función se maneja en la UI de Compose
+        status.value = ApiResponseStatus.Loading()
     }
 
     override fun onEmvProcessFinished(resultCode: Int) {
@@ -218,12 +243,42 @@ class EmvViewModel @Inject constructor(
             // Código de error genérico
             else -> "Código de resultado desconocido: $resultCode"
         }
-        status.value = ApiResponseStatus.Success(resultMessage)
+        
+        // Procesar la transacción con el servidor si fue exitosa
+        if (resultCode == SdkResult.Success) {
+            processTransactionWithServer()
+        } else {
+            status.value = ApiResponseStatus.Success(resultMessage)
+        }
     }
 
     override fun onRequestShowToast(message: String) {
         status.value = ApiResponseStatus.Success(message)
     }
-
-
+    
+    // Método para procesar la transacción con el servidor
+    private fun processTransactionWithServer() {
+        viewModelScope.launch {
+            try {
+                // Obtener datos de la tarjeta y la transacción
+                val cardInfo = emvProcessor.getCardInfo()
+                val field55 = emvProcessor.getField55()
+                
+                // Aquí implementarías la llamada a tu API para procesar el pago
+                // Por ejemplo:
+                // val response = digipayRepository.processPayment(cardInfo, field55, amount)
+                
+                // Para este ejemplo, simulamos una respuesta exitosa
+                status.value = ApiResponseStatus.Success("Transacción procesada exitosamente\nTarjeta: ${cardInfo["cardNumber"]}")
+            } catch (e: Exception) {
+                status.value = ApiResponseStatus.Error("Error al procesar la transacción: ${e.message}")
+            }
+        }
+    }
+    
+    override fun onCleared() {
+        super.onCleared()
+        // Detener cualquier proceso EMV en curso al destruir el ViewModel
+        emvProcessor.stopEmitting()
+    }
 }

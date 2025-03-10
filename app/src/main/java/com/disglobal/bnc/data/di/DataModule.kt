@@ -9,6 +9,7 @@ import com.disglobal.bnc.data.local.database.TransactionDao
 import com.disglobal.bnc.data.remote.createCustomOkHttpClient
 import com.disglobal.bnc.nexgobnc
 import com.disglobal.bnc.utils.EmvCardReaderNew
+import com.disglobal.bnc.utils.EmvConfigLoader
 import com.google.gson.GsonBuilder
 import com.nexgo.oaf.apiv3.DeviceEngine
 import com.nexgo.oaf.apiv3.device.reader.CardReader
@@ -61,6 +62,15 @@ object DataSourceModule {
     fun provideDeviceEngine(@ApplicationContext application: Context): DeviceEngine {
         val app = application as nexgobnc
         return app.deviceEngine ?: throw IllegalStateException("DeviceEngine is not initialized")
+    }
+
+    @Provides
+    @Singleton
+    fun provideEmvConfigLoader(
+        @ApplicationContext context: Context,
+        deviceEngine: DeviceEngine
+    ): EmvConfigLoader {
+        return EmvConfigLoader(context, deviceEngine)
     }
 
     @Provides
