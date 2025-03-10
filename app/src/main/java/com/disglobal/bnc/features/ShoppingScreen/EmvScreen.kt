@@ -25,20 +25,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.disglobal.bnc.DigipayApi.domain.entities.GetInfoAffiliatesResp
 import com.disglobal.bnc.data.remote.dto.ApiResponseStatus
 import com.disglobal.bnc.ui.theme.MyApplicationTheme
 import com.disglobal.bnc.utils.EmvCardReaderNew
 
 @Composable
 fun EmvScreen(
-    navController: NavController,
-    viewModel: EmvViewModel = hiltViewModel()
+    navController: NavController, viewModel: EmvViewModel = hiltViewModel()
 ) {
     val transactionState by viewModel.transactionState()
         .observeAsState(EmvCardReaderNew.TransactionState.Idle)
@@ -52,6 +53,7 @@ fun EmvScreen(
     var showPinDialog by remember { mutableStateOf(false) }
     var appNames by remember { mutableStateOf(listOf<String>()) }
     var cardNumber by remember { mutableStateOf("") }
+    val commerce = GetInfoAffiliatesResp.getCommerce(LocalContext.current)
 
 
     // Observar cambios en el estado de la transacción
@@ -111,8 +113,7 @@ fun EmvScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(
-            value = amount,
+        OutlinedTextField(value = amount,
             onValueChange = { amount = it },
             label = { Text("Monto") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -122,8 +123,11 @@ fun EmvScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { viewModel.startEmvProcess(amount.replace(".", "")) },
-            modifier = Modifier.fillMaxWidth()
+            onClick = {
+                viewModel.startEmvProcess(
+                    commerce ?: GetInfoAffiliatesResp(), amount.replace(".", "")
+                )
+            }, modifier = Modifier.fillMaxWidth()
         ) {
             Text("Iniciar Transacción")
         }
@@ -192,33 +196,27 @@ fun EmvScreen(
 
     // Diálogo de selección de aplicación
     if (showAppSelectionDialog) {
-        AlertDialog(
-            onDismissRequest = { },
-            title = { Text("Seleccione una aplicación") },
-            text = {
-                Column {
-                    appNames.forEachIndexed { index, appName ->
-                        Button(
-                            onClick = {
-                                viewModel.onApplicationSelected(index)
-                                showAppSelectionDialog = false
-                            }, modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp)
-                        ) {
-                            Text(appName)
-                        }
+        AlertDialog(onDismissRequest = { }, title = { Text("Seleccione una aplicación") }, text = {
+            Column {
+                appNames.forEachIndexed { index, appName ->
+                    Button(
+                        onClick = {
+                            viewModel.onApplicationSelected(index)
+                            showAppSelectionDialog = false
+                        }, modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                    ) {
+                        Text(appName)
                     }
                 }
-            },
-            confirmButton = { }
-        )
+            }
+        }, confirmButton = { })
     }
 
     // Diálogo de confirmación de número de tarjeta
     if (showCardConfirmationDialog) {
-        AlertDialog(
-            onDismissRequest = { },
+        AlertDialog(onDismissRequest = { },
             title = { Text("Confirmar número de tarjeta") },
             text = { Text("Número de tarjeta: $cardNumber") },
             confirmButton = {
@@ -236,45 +234,38 @@ fun EmvScreen(
                 }) {
                     Text("Cancelar")
                 }
-            }
-        )
+            })
     }
 
     // Diálogo de ingreso de PIN
     if (showPinDialog) {
-        AlertDialog(
-            onDismissRequest = { },
-            title = { Text("Ingrese su PIN") },
-            text = {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(pinText, style = MaterialTheme.typography.headlineMedium)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("Use el teclado físico del dispositivo para ingresar su PIN")
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        if (viewModel.validatePin(pinText)) {
-                            viewModel.onPinInputComplete(true, false)
-                            showPinDialog = false
-                        }
-                    }, enabled = pinText.length >= 4
-                ) {
-                    Text("Confirmar")
-                }
-            },
-            dismissButton = {
-                Button(onClick = {
-                    viewModel.onPinInputCancelled()
-                    showPinDialog = false
-                }) {
-                    Text("Cancelar")
-                }
+        AlertDialog(onDismissRequest = { }, title = { Text("Ingrese su PIN") }, text = {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(pinText, style = MaterialTheme.typography.headlineMedium)
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Use el teclado físico del dispositivo para ingresar su PIN")
             }
-        )
+        }, confirmButton = {
+            Button(
+                onClick = {
+                    if (viewModel.validatePin(pinText)) {
+                        viewModel.onPinInputComplete(true, false)
+                        showPinDialog = false
+                    }
+                }, enabled = pinText.length >= 4
+            ) {
+                Text("Confirmar")
+            }
+        }, dismissButton = {
+            Button(onClick = {
+                viewModel.onPinInputCancelled()
+                showPinDialog = false
+            }) {
+                Text("Cancelar")
+            }
+        })
     }
 }
 
@@ -299,8 +290,7 @@ fun DefaultPreview() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = "1.00",
+            OutlinedTextField(value = "1.00",
                 onValueChange = { },
                 label = { Text("Monto") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -310,8 +300,7 @@ fun DefaultPreview() {
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { },
-                modifier = Modifier.fillMaxWidth()
+                onClick = { }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Iniciar Transacción")
             }

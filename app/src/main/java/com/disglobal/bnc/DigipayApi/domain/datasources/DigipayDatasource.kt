@@ -88,7 +88,7 @@ interface DigipayDatasource {
     @POST(PATH_GET_TRANSACTION)
     suspend fun processTransaction(
         @Body tlvData: RequestBody
-    ): TransactionProcessResponse
+    ): String
 
 
     @POST(ECHO_TEST)

@@ -6,16 +6,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.disglobal.bnc.DigipayApi.TlvBuilder
+import com.disglobal.bnc.DigipayApi.domain.entities.GetInfoAffiliatesResp
 import com.disglobal.bnc.DigipayApi.domain.repositories.DigipayRepository
 import com.disglobal.bnc.data.remote.dto.ApiResponseStatus
 import com.disglobal.bnc.utils.EmvCardReaderNew
 import com.disglobal.bnc.utils.EmvCardReaderNew.TransactionState
 import com.disglobal.bnc.utils.EmvConfigLoader
-import com.google.gson.Gson
 import com.nexgo.common.ByteUtils
 import com.nexgo.oaf.apiv3.SdkResult
 import com.nexgo.oaf.apiv3.emv.CandidateAppInfoEntity
-import com.nexgo.oaf.apiv3.emv.EmvDataSourceEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -43,12 +43,12 @@ class EmvViewModel @Inject constructor(
         // Configurar listeners para observar cambios en el estado de la transacción
         observeTransactionState()
         observePasswordPIN()
-        
+
         // Configurar listeners para eventos EMV
         emvProcessor.setPinInputListener(this)
         emvProcessor.setCardSelectionListener(this)
         emvProcessor.setEmvProcessListener(this)
-        
+
         // Inicializar configuraciones EMV
         initializeEmvConfigurations()
     }
@@ -59,9 +59,11 @@ class EmvViewModel @Inject constructor(
                 val result = emvConfigLoader.initEmvConfigurations()
                 if (result) {
                     val (aidCount, capkCount) = emvConfigLoader.checkAidAndCapk()
-                    status.value = ApiResponseStatus.Success("Configuraciones EMV inicializadas: $aidCount AIDs, $capkCount CAPKs")
+                    status.value =
+                        ApiResponseStatus.Success("Configuraciones EMV inicializadas: $aidCount AIDs, $capkCount CAPKs")
                 } else {
-                    status.value = ApiResponseStatus.Error("Error al inicializar configuraciones EMV")
+                    status.value =
+                        ApiResponseStatus.Error("Error al inicializar configuraciones EMV")
                 }
             } catch (e: Exception) {
                 status.value = ApiResponseStatus.Error("Error: ${e.message}")
@@ -86,7 +88,7 @@ class EmvViewModel @Inject constructor(
     }
 
     // Métodos para interactuar con el procesador EMV
-    fun startEmvProcess(amountValue: String) {
+    fun startEmvProcess(client: GetInfoAffiliatesResp, amountValue: String) {
         status.value = ApiResponseStatus.Loading()
         emvProcessor.startEmvProcess(amountValue)
     }
@@ -243,7 +245,7 @@ class EmvViewModel @Inject constructor(
             // Código de error genérico
             else -> "Código de resultado desconocido: $resultCode"
         }
-        
+
         // Procesar la transacción con el servidor si fue exitosa
         if (resultCode == SdkResult.Success) {
             processTransactionWithServer()
@@ -255,27 +257,126 @@ class EmvViewModel @Inject constructor(
     override fun onRequestShowToast(message: String) {
         status.value = ApiResponseStatus.Success(message)
     }
-    
+
     // Método para procesar la transacción con el servidor
     private fun processTransactionWithServer() {
         viewModelScope.launch {
             try {
+                status.value = ApiResponseStatus.Loading("Procesando transacción...")
+
                 // Obtener datos de la tarjeta y la transacción
                 val cardInfo = emvProcessor.getCardInfo()
                 val field55 = emvProcessor.getField55()
-                
-                // Aquí implementarías la llamada a tu API para procesar el pago
-                // Por ejemplo:
-                // val response = digipayRepository.processPayment(cardInfo, field55, amount)
-                
-                // Para este ejemplo, simulamos una respuesta exitosa
-                status.value = ApiResponseStatus.Success("Transacción procesada exitosamente\nTarjeta: ${cardInfo["cardNumber"]}")
+
+                // Obtener el monto de la transacción
+                val amount = cardInfo["amount"] ?: "0"
+
+                // Obtener los datos del comercio/afiliado
+                val affiliateInfo = digipayRepository.getAffiliateInfo()
+
+                // Construir el TLV para la transacción
+                val tlvData = TlvBuilder.buildSaleTlvMessage(
+                    cardInfo = cardInfo,
+                    field55 = ByteUtils.hexString2ByteArray(field55),
+                    affiliateInfo = affiliateInfo
+                )
+
+                // Llamar al repositorio para procesar el pago
+                val response = digipayRepository.processPayment(tlvData)
+
+                // Procesar la respuesta
+                when (response) {
+                    is ApiResponseStatus.Success -> {
+                        val transactionData = response.data
+                        status.value = ApiResponseStatus.Success(
+                            "Transacción exitosa\n" + "Status: ${transactionData}\n" + "Tarjeta:"
+                        )
+                    }
+
+                    is ApiResponseStatus.Error -> {
+                        status.value =
+                            ApiResponseStatus.Error("Error en la transacción: ${response.message}")
+                    }
+
+                    is ApiResponseStatus.Loading -> {
+                        // No debería llegar aquí, pero por si acaso
+                        status.value = ApiResponseStatus.Loading("Procesando...")
+                    }
+                }
             } catch (e: Exception) {
-                status.value = ApiResponseStatus.Error("Error al procesar la transacción: ${e.message}")
+                status.value =
+                    ApiResponseStatus.Error("Error al procesar la transacción: ${e.message}")
             }
         }
     }
-    
+
+    // Método para construir los datos TLV para la transacción
+    private fun buildTlvData(
+        cardInfo: Map<String, String>, field55: ByteArray, affiliateInfo: GetInfoAffiliatesResp?
+    ): String {
+        try {
+            // Convertir field55 a formato hexadecimal
+            val field55Hex = ByteUtils.byteArray2HexString(field55)
+
+            // Agregar el tipo de mensaje (Venta)
+            val messageType = "0200"
+
+            // Agregar un campo de prueba (C2) con datos aleatorios
+            // Nota: En un escenario real, estos datos deberían ser generados de manera segura
+            val randomC2Data = generateRandomHexString(128)
+
+            // Agregar un campo de prueba (C0) con datos aleatorios
+            val randomC0Data = generateRandomHexString(10)
+
+            // Agregar campos adicionales específicos del comercio
+            val merchantSerial = affiliateInfo?.serial ?: ""
+            val merchantSerialHex = stringToHexString(merchantSerial)
+
+            // Construir el TLV completo
+            val tlvData = StringBuilder()
+
+            // Tipo de mensaje
+            tlvData.append("DF8330").append("02").append(messageType)
+
+            // Campo C2 con datos aleatorios
+            tlvData.append("C2").append(String.format("%02X", randomC2Data.length / 2))
+                .append(randomC2Data)
+
+            // Campo C0 con datos aleatorios
+            tlvData.append("C0").append(String.format("%02X", randomC0Data.length / 2))
+                .append(randomC0Data)
+
+            // Campos adicionales del comercio
+            tlvData.append("DF834F").append(String.format("%02X", merchantSerialHex.length / 2))
+                .append(merchantSerialHex)
+
+            // Agregar el field55 original
+            tlvData.append(field55Hex)
+
+            return tlvData.toString()
+        } catch (e: Exception) {
+            return "{\"error\": \"${e.message}\"}"
+        }
+    }
+
+    // Método para convertir una cadena a su representación hexadecimal
+    private fun stringToHexString(input: String): String {
+        return input.toByteArray(Charsets.UTF_8).joinToString("") { byte -> "%02X".format(byte) }
+    }
+
+    // Método para generar una cadena hexadecimal aleatoria de una longitud específica
+    private fun generateRandomHexString(length: Int): String {
+        val charPool = "0123456789ABCDEF"
+        return (1..length).map { charPool.random() }.joinToString("")
+    }
+
+    // Método para enmascarar el número de tarjeta (mostrar solo los últimos 4 dígitos)
+    private fun maskCardNumber(cardNumber: String): String {
+        if (cardNumber.length < 4) return cardNumber
+        val lastFourDigits = cardNumber.takeLast(4)
+        return "****-****-****-$lastFourDigits"
+    }
+
     override fun onCleared() {
         super.onCleared()
         // Detener cualquier proceso EMV en curso al destruir el ViewModel

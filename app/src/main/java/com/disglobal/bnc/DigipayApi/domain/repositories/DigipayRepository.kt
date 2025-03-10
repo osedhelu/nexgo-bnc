@@ -42,6 +42,21 @@ interface DigipayRepository {
 
     suspend fun registerTransaction(
         requestBody: RequestBody
-    ): ApiResponseStatus<TransactionProcessResponse>
+    ): ApiResponseStatus<String>
+
+    /**
+     * Procesa un pago con tarjeta
+     * @param tlvData Datos TLV de la transacción
+     * @return Respuesta del procesamiento de la transacción
+     */
+    suspend fun processPayment(
+        tlvData: String,
+    ): ApiResponseStatus<String>
+
+    /**
+     * Obtiene la información del afiliado/comercio
+     * @return Información del afiliado/comercio
+     */
+    suspend fun getAffiliateInfo(): GetInfoAffiliatesResp?
 }
 

@@ -740,6 +740,9 @@ class EmvCardReaderNew(
         // Obtener información básica de la tarjeta
         cardInfo["cardNumber"] = cardNo ?: ""
         
+        // Agregar el monto de la transacción
+        cardInfo["amount"] = amount ?: "0"
+        
         // Obtener datos de la tarjeta EMV
         val cardInfoEntity = emvHandler.emvCardDataInfo
         if (cardInfoEntity != null) {
